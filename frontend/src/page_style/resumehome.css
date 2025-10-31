@@ -1,0 +1,233 @@
+/* 🌟 Modern Glassmorphic UI — AI Resume Builder */
+
+.modern-home {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(180deg, #f4f7ff 0%, #eef1f9 100%);
+  color: #1e1e2f;
+  min-height: 100vh;
+  padding-bottom: 100px;
+  overflow-x: hidden;
+}
+
+/* 🦾 Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #0047ab, #4a6cf7, #73a6ff);
+  color: #fff;
+  text-align: center;
+  padding: 110px 25px 130px;
+  border-bottom-left-radius: 80px;
+  border-bottom-right-radius: 80px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  max-width: 750px;
+  margin: 0 auto 30px;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+/* 🎯 Buttons */
+.btn {
+  border: none;
+  padding: 14px 32px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.1);
+}
+
+.primary-btn {
+  background-color: #ffffff;
+  color: #0047ab;
+}
+
+.primary-btn:hover {
+  background-color: #e8efff;
+  transform: translateY(-3px);
+}
+
+.secondary-btn {
+  background-color: #1e1e2f;
+  color: #fff;
+}
+
+.secondary-btn:hover {
+  background-color: #34364a;
+  transform: translateY(-3px);
+}
+
+.success-btn {
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+.success-btn:hover {
+  background-color: #28b463;
+  transform: translateY(-3px);
+}
+
+/* ⚙️ Main Container */
+.ai-container {
+  max-width: 950px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+/* 🧠 Section Titles */
+.section-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.section-desc {
+  text-align: center;
+  color: #555;
+  margin-bottom: 40px;
+  font-size: 1rem;
+}
+
+/* 📤 Upload Card (Glassmorphism Style) */
+.upload-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 18px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.upload-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* 📁 Upload Area */
+.upload-group {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.upload-label {
+  background: #eef3ff;
+  border: 2px dashed #6c8bff;
+  padding: 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 500;
+  color: #3654ff;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.upload-label:hover {
+  background: #e2e9ff;
+}
+
+.upload-label input {
+  display: none;
+}
+
+.file-name {
+  font-size: 0.95rem;
+  color: #333;
+  text-align: center;
+}
+
+/* ✅ Checkbox */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  color: #333;
+}
+
+textarea {
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  padding: 12px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  background: #fff;
+}
+
+/* 🧾 Results Section */
+.result-section {
+  margin-top: 35px;
+  background: #f9fbff;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  border-left: 6px solid #4a6cf7;
+}
+
+.score-high {
+  color: #27ae60;
+  font-weight: 700;
+}
+
+.score-medium {
+  color: #f1c40f;
+  font-weight: 700;
+}
+
+.score-low {
+  color: #e74c3c;
+  font-weight: 700;
+}
+
+.resume-style {
+  margin: 20px 0;
+}
+
+.download-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-section {
+    padding: 80px 20px;
+    border-radius: 0;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .upload-card {
+    padding: 22px;
+  }
+}

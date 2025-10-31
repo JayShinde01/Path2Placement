@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "../page_style/login.css";
 import Navbar from "../components/Navbar"
-import API_BASE_URL from "../api"
+import {API_BASE_URL} from "../api"
 
 export default function Login() {
   const [email, setEmail] = useState("");

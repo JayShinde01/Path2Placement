@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import "../page_style/home.css";
+import "../page_style/resumehome.css";
 import {
   CircularProgress,
   Snackbar,
@@ -16,7 +16,7 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import { ML_API_URl } from "../api";
+import { ML_API_URL } from "../api";
 
 export default function ResumeBuilderFront() {
   const navigate = useNavigate();

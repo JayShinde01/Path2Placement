@@ -1,78 +1,73 @@
-/* 🌟 Modern Glassmorphic UI — AI Resume Builder */
-
-.modern-home {
+/* Home Page Styling */
+.home-page {
   font-family: "Poppins", sans-serif;
-  background: linear-gradient(180deg, #f4f7ff 0%, #eef1f9 100%);
-  color: #1e1e2f;
+  background: #f9fafc;
+  color: #222;
   min-height: 100vh;
-  padding-bottom: 100px;
-  overflow-x: hidden;
 }
 
-/* 🦾 Hero Section */
+/* Hero Section */
 .hero-section {
-  background: linear-gradient(135deg, #0047ab, #4a6cf7, #73a6ff);
-  color: #fff;
+  background: linear-gradient(135deg, #0052d4, #6fb1fc);
+  color: white;
   text-align: center;
-  padding: 110px 25px 130px;
-  border-bottom-left-radius: 80px;
-  border-bottom-right-radius: 80px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 120px 20px;
 }
 
 .hero-title {
-  font-size: 3.2rem;
+  font-size: 2.8rem;
   font-weight: 700;
-  letter-spacing: 1px;
-  margin-bottom: 15px;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.3;
+}
+
+.hero-title span {
+  color: #ff9800;
 }
 
 .hero-subtitle {
+  margin: 20px auto 40px;
+  max-width: 700px;
   font-size: 1.1rem;
-  max-width: 750px;
-  margin: 0 auto 30px;
-  opacity: 0.95;
-  line-height: 1.6;
+  opacity: 0.9;
 }
 
 .button-group {
   display: flex;
   justify-content: center;
-  gap: 20px;
   flex-wrap: wrap;
-  margin-top: 30px;
+  gap: 16px;
 }
 
-/* 🎯 Buttons */
 .btn {
   border: none;
-  padding: 14px 32px;
-  border-radius: 30px;
+  padding: 12px 28px;
+  border-radius: 25px;
   font-weight: 600;
-  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.1);
+  transition: 0.3s ease;
+  text-decoration: none;
 }
 
 .primary-btn {
   background-color: #ffffff;
-  color: #0047ab;
+  color: #0052d4;
 }
 
 .primary-btn:hover {
-  background-color: #e8efff;
-  transform: translateY(-3px);
+  background-color: #e3ecff;
+  transform: translateY(-2px);
 }
 
 .secondary-btn {
-  background-color: #1e1e2f;
+  background-color: #222;
   color: #fff;
 }
 
 .secondary-btn:hover {
-  background-color: #34364a;
-  transform: translateY(-3px);
+  background-color: #333;
+  transform: translateY(-2px);
 }
 
 .success-btn {
@@ -82,152 +77,59 @@
 
 .success-btn:hover {
   background-color: #28b463;
-  transform: translateY(-3px);
 }
 
-/* ⚙️ Main Container */
-.ai-container {
-  max-width: 950px;
-  margin: 60px auto;
-  padding: 0 20px;
+/* Features Section */
+.features-section {
+  margin-top: 60px;
+  text-align: center;
+  padding: 40px 20px;
 }
 
-/* 🧠 Section Titles */
 .section-title {
-  text-align: center;
-  font-weight: 700;
   font-size: 1.8rem;
-  color: #2c3e50;
-  margin-bottom: 8px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 30px;
 }
 
-.section-desc {
-  text-align: center;
-  color: #555;
-  margin-bottom: 40px;
-  font-size: 1rem;
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-/* 📤 Upload Card (Glassmorphism Style) */
-.upload-card {
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 18px;
-  padding: 30px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.upload-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
-}
-
-/* 📁 Upload Area */
-.upload-group {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.upload-label {
-  background: #eef3ff;
-  border: 2px dashed #6c8bff;
-  padding: 14px;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 500;
-  color: #3654ff;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.upload-label:hover {
-  background: #e2e9ff;
-}
-
-.upload-label input {
-  display: none;
-}
-
-.file-name {
-  font-size: 0.95rem;
-  color: #333;
-  text-align: center;
-}
-
-/* ✅ Checkbox */
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 5px;
-  cursor: pointer;
-  color: #333;
-}
-
-textarea {
-  border: 1px solid #dcdcdc;
-  border-radius: 10px;
-  padding: 12px;
-  resize: vertical;
-  font-family: inherit;
-  font-size: 1rem;
-  line-height: 1.5;
+.feature-card {
   background: #fff;
-}
-
-/* 🧾 Results Section */
-.result-section {
-  margin-top: 35px;
-  background: #f9fbff;
   border-radius: 16px;
   padding: 25px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-  border-left: 6px solid #4a6cf7;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.score-high {
-  color: #27ae60;
-  font-weight: 700;
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
 }
 
-.score-medium {
-  color: #f1c40f;
-  font-weight: 700;
+.feature-card h3 {
+  color: #0052d4;
+  margin-bottom: 10px;
 }
 
-.score-low {
-  color: #e74c3c;
-  font-weight: 700;
+.feature-card p {
+  color: #555;
+  font-size: 0.95rem;
 }
 
-.resume-style {
-  margin: 20px 0;
-}
-
-.download-section {
-  text-align: center;
-  margin-top: 20px;
-}
-
-/* 📱 Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
   .hero-title {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
-
   .hero-section {
-    padding: 80px 20px;
-    border-radius: 0;
-  }
-
-  .button-group {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .upload-card {
-    padding: 22px;
+    padding: 90px 15px;
   }
 }
