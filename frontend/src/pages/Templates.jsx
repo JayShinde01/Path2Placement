@@ -50,7 +50,7 @@ export default function Templates() {
 
       <div className="templates-grid">
         <div className="template-card">
-          <img src="public\t1.jpg" alt="Template 1" className="template-image" />
+          <img src="/t1.jpg" alt="Template 1" className="template-image" />
           <button
             onClick={() => handleSelect("Template1")}
             className="template-btn"
@@ -60,7 +60,7 @@ export default function Templates() {
         </div>
 
         <div className="template-card">
-          <img src="public\t2.jpg" alt="Template 2" className="template-image" />
+          <img src="/t2.jpg" alt="Template 2" className="template-image" />
           <button
             onClick={() => handleSelect("Template2")}
             className="template-btn"
@@ -70,7 +70,7 @@ export default function Templates() {
         </div>
 
         <div className="template-card">
-          <img src="public\t3.jpg" alt="Template 3" className="template-image" />
+          <img src="/t3.jpg" alt="Template 3" className="template-image" />
           <button
             onClick={() => handleSelect("Template3")}
             className="template-btn"
