@@ -1,0 +1,99 @@
+/* ===== Register Page Background ===== */
+.register-page {
+  height: 100vh;
+  background: linear-gradient(135deg, #9333ea, #3b82f6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ===== Register Card ===== */
+.register-container {
+  background: white;
+  width: 420px;
+  padding: 40px 35px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* ===== Text Styles ===== */
+.register-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+.register-subtitle {
+  color: #6b7280;
+  margin-bottom: 25px;
+}
+
+/* ===== Form ===== */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.register-form input {
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+.register-form input:focus {
+  border-color: #9333ea;
+  outline: none;
+}
+
+/* ===== Button ===== */
+.register-btn {
+  background: linear-gradient(90deg, #9333ea, #3b82f6);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.register-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+/* ===== Footer Text ===== */
+.login-text {
+  margin-top: 20px;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.login-link {
+  color: #3b82f6;
+  font-weight: 600;
+  text-decoration: none;
+}
+.login-link:hover {
+  text-decoration: underline;
+}
+
+/* ===== Animation ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+  .register-container {
+    width: 90%;
+    padding: 30px 20px;
+  }
+}

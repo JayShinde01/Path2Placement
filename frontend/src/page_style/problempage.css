@@ -1,0 +1,93 @@
+.problem-container {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+  background-color: #0f172a;
+  color: white;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.problem-left {
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.problem-right {
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 85vh;
+}
+
+.problem-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.language-select {
+  background: #0f172a;
+  color: white;
+  border: 1px solid #334155;
+  border-radius: 5px;
+  padding: 6px 10px;
+}
+
+.editor-container {
+  flex: 1;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.run-btn,
+.reset-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.run-btn {
+  background: #10b981;
+}
+
+.reset-btn {
+  background: #3b82f6;
+}
+
+.output-box {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 15px;
+  flex-shrink: 0;
+}
+
+textarea {
+  width: 100%;
+  background: #0f172a;
+  color: white;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 10px;
+  resize: none;
+}
+
+/* Responsive for small screens */
+@media (max-width: 900px) {
+  .problem-container {
+    grid-template-columns: 1fr;
+  }
+  .problem-right {
+    height: auto;
+  }
+}

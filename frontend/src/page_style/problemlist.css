@@ -1,0 +1,217 @@
+/* ===== Base Page ===== */
+.problems-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, #0d1117, #000);
+  color: #e6edf3;
+  padding: 2rem 1rem 4rem;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.3s ease;
+}
+
+/* ===== Header ===== */
+.problems-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 0 auto 2rem auto;
+  flex-wrap: wrap;
+}
+
+.problems-header h1 {
+  font-size: 1.8rem;
+  background: linear-gradient(90deg, #00eaff, #007bff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.back-btn {
+  background: rgba(0, 234, 255, 0.1);
+  color: #00eaff;
+  border: 1px solid #00eaff;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: #00eaff;
+  color: #0d1117;
+}
+
+/* ===== Filter Section ===== */
+.problems-filter {
+  max-width: 900px;
+  margin: 0 auto 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.problems-filter input {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #1f2937;
+  background-color: #161b22;
+  color: #e6edf3;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.problems-filter input:focus {
+  outline: none;
+  border-color: #00eaff;
+  box-shadow: 0 0 8px rgba(0, 234, 255, 0.2);
+}
+
+.filter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.filter-tag {
+  background: rgba(22, 27, 34, 0.7);
+  border: 1px solid #1f2937;
+  color: #9ca3af;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.filter-tag:hover {
+  border-color: #00eaff;
+  color: #00eaff;
+}
+
+.filter-tag.active {
+  background: #00eaff;
+  color: #0d1117;
+  font-weight: 600;
+}
+
+/* ===== Problems List ===== */
+.problems-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ===== Problem Card ===== */
+.problem-card {
+  background: rgba(22, 27, 34, 0.95);
+  border: 1px solid rgba(0, 234, 255, 0.15);
+  border-radius: 14px;
+  padding: 1.4rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.problem-card:hover {
+  transform: translateY(-4px);
+  border-color: #00eaff;
+  box-shadow: 0 0 16px rgba(0, 234, 255, 0.15);
+}
+
+/* ===== Card Header ===== */
+.problem-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.problem-header h3 {
+  margin: 0;
+  flex: 1;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.problem-number {
+  color: #00eaff;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.difficulty {
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.difficulty.easy {
+  background-color: #10b981;
+}
+
+.difficulty.medium {
+  background-color: #fbbf24;
+}
+
+.difficulty.hard {
+  background-color: #ef4444;
+}
+
+/* ===== Description ===== */
+.problem-desc {
+  margin-top: 0.6rem;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* ===== Footer ===== */
+.problem-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.category {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.solve-btn {
+  color: #00eaff;
+  background: rgba(0, 234, 255, 0.08);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.solve-btn:hover {
+  background: #00eaff;
+  color: #0d1117;
+}
+
+/* ===== No Results ===== */
+.no-results {
+  text-align: center;
+  color: #9ca3af;
+  margin-top: 2rem;
+  font-style: italic;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .problems-header h1 {
+    font-size: 1.5rem;
+  }
+  .back-btn {
+    margin-bottom: 1rem;
+  }
+}
