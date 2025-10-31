@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Container, Typography, Button, Box, CircularProgress, Paper } from "@mui/material";
+import { API_BASE_URL } from "../api";
 
 export default function ResumeMatcher() {
   const [resume, setResume] = useState(null);
@@ -19,7 +20,7 @@ export default function ResumeMatcher() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/resume-match", formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/resume-match`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResult(res.data);

@@ -16,6 +16,7 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
+import { ML_API_URl } from "../api";
 
 export default function ResumeBuilderFront() {
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ export default function ResumeBuilderFront() {
     setResult(null);
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/match", formData, {
+      const res = await axios.post(`${ML_API_URl}match`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResult(res.data);
@@ -91,7 +92,7 @@ export default function ResumeBuilderFront() {
       formData.append("resume_style", resumeStyle);
 
       const res = await axios.post(
-        "http://127.0.0.1:8000/generate_tailored_resume",
+        `${ML_API_URl}generate_tailored_resume`,
         formData,
         { responseType: "blob" }
       );

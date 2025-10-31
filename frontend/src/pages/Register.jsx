@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import "../page_style/register.css";
 import Navbar from "../components/Navbar"
+import { API_BASE_URL } from "../api";
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -20,7 +21,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", form);
+      const res = await axios.post(`${API_BASE_URL}api/auth/register`, form);
       console.log(res.data);
       alert("Registered Successfully!");
       navigate("/login");

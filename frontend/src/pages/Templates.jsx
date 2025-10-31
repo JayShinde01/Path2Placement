@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../page_style/templates.css"; // 👈 custom CSS file
 import Navbar from "../components/Navbar";
+import { API_BASE_URL } from "../api";
 
 export default function Templates() {
   const [templates, setTemplates] = useState([]);
@@ -10,7 +11,7 @@ export default function Templates() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/templates")
+      .get(`${API_BASE_URL}api/templates`)
       .then((res) => setTemplates(res.data))
       .catch((err) => console.log(err));
   }, []);
@@ -24,7 +25,7 @@ export default function Templates() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/resumes",
+        `${API_BASE_URL}api/resumes`,
         { templateId, data: resumeData },
         {
           headers: {
