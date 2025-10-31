@@ -1,9 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../page_style/navbar.css";
+import { FaBars, FaTimes } from "react-icons/fa"; // 👈 Add react-icons
 
 export default function Navbar() {
   const [userName, setUserName] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,15 +28,37 @@ export default function Navbar() {
         </h2>
       </div>
 
-      <ul className="nav-links">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/resume">Resume Builder</Link></li>
-        <li><Link to="/job-recommendation">Job Roles</Link></li>
-        <li><Link to="/codinghome">Coding Practice</Link></li>
-        <li><Link to="/interview">AI Interview</Link></li>
-        <li><Link to="/reports">Reports</Link></li>
+      {/* Hamburger Icon */}
+      <div className="menu-icon" onClick={() => setMenuOpen(!menuOpen)}>
+        {menuOpen ? <FaTimes /> : <FaBars />}
+      </div>
+
+      <ul className={`nav-links ${menuOpen ? "active" : ""}`}>
+        <li><Link to="/" onClick={() => setMenuOpen(false)}>Home</Link></li>
+        <li><Link to="/resume" onClick={() => setMenuOpen(false)}>Resume Builder</Link></li>
+        <li><Link to="/job-recommendation" onClick={() => setMenuOpen(false)}>Job Roles</Link></li>
+        <li><Link to="/codinghome" onClick={() => setMenuOpen(false)}>Coding Practice</Link></li>
+        <li><Link to="/interview" onClick={() => setMenuOpen(false)}>AI Interview</Link></li>
+        <li><Link to="/reports" onClick={() => setMenuOpen(false)}>Reports</Link></li>
+
+        {/* Show buttons inside menu on mobile */}
+        {menuOpen && (
+          <div className="mobile-buttons">
+            {!userName ? (
+              <>
+                <Link to="/login" className="small-btn">Login</Link>
+                <Link to="/register" className="small-btn outline">Register</Link>
+              </>
+            ) : (
+              <button onClick={handleLogout} className="small-btn logout-btn">
+                Logout
+              </button>
+            )}
+          </div>
+        )}
       </ul>
 
+      {/* Desktop buttons */}
       <div className="nav-buttons">
         {!userName ? (
           <>

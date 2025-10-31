@@ -11,20 +11,22 @@
   z-index: 1000;
 }
 
+/* Logo */
 .logo h2 {
   font-weight: 700;
   font-size: 1.6rem;
 }
 .logo span {
-  color: #facc15; /* Yellow Accent */
+  color: #facc15;
 }
 
+/* Links */
 .nav-links {
   list-style: none;
   display: flex;
   gap: 25px;
+  transition: 0.3s ease-in-out;
 }
-
 .nav-links a {
   color: white;
   text-decoration: none;
@@ -35,6 +37,7 @@
   color: #facc15;
 }
 
+/* Buttons */
 .nav-buttons .small-btn {
   background-color: white;
   color: #3b82f6;
@@ -54,17 +57,16 @@
   background-color: #facc15;
   color: #111;
 }
+
+/* User section */
 .user-section {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
 .user-name {
-  color: #333;
   font-weight: 600;
 }
-
 .logout-btn {
   background-color: #f44336;
   border: none;
@@ -74,7 +76,46 @@
   cursor: pointer;
   transition: 0.3s;
 }
-
 .logout-btn:hover {
   background-color: #d32f2f;
+}
+
+/* -------- RESPONSIVE -------- */
+.menu-icon {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* Mobile view */
+@media (max-width: 900px) {
+  .nav-links {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: linear-gradient(90deg, #3b82f6, #9333ea);
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nav-links.active {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .menu-icon {
+    display: block;
+  }
+
+  .nav-buttons {
+    display: none; /* Hide buttons in navbar, move them inside mobile menu if needed */
+  }
 }
