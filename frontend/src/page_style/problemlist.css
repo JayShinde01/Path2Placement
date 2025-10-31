@@ -1,4 +1,4 @@
-/* ===== Base Page ===== */
+/* 🌌 ===== Base Page ===== */
 .problems-page {
   min-height: 100vh;
   background: radial-gradient(circle at top left, #0d1117, #000);
@@ -8,7 +8,7 @@
   transition: all 0.3s ease;
 }
 
-/* ===== Header ===== */
+/* 🧭 ===== Header ===== */
 .problems-header {
   display: flex;
   align-items: center;
@@ -16,6 +16,7 @@
   max-width: 900px;
   margin: 0 auto 2rem auto;
   flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .problems-header h1 {
@@ -38,9 +39,10 @@
 .back-btn:hover {
   background: #00eaff;
   color: #0d1117;
+  transform: translateY(-2px);
 }
 
-/* ===== Filter Section ===== */
+/* 🔍 ===== Filter Section ===== */
 .problems-filter {
   max-width: 900px;
   margin: 0 auto 2rem auto;
@@ -93,7 +95,7 @@
   font-weight: 600;
 }
 
-/* ===== Problems List ===== */
+/* 🧩 ===== Problems List ===== */
 .problems-list {
   display: flex;
   flex-direction: column;
@@ -102,7 +104,7 @@
   margin: 0 auto;
 }
 
-/* ===== Problem Card ===== */
+/* 🪐 ===== Problem Card ===== */
 .problem-card {
   background: rgba(22, 27, 34, 0.95);
   border: 1px solid rgba(0, 234, 255, 0.15);
@@ -161,12 +163,12 @@
   background-color: #ef4444;
 }
 
-/* ===== Description ===== */
+/* 🧾 ===== Description ===== */
 .problem-desc {
   margin-top: 0.6rem;
   color: #b0b0b0;
   font-size: 0.9rem;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 /* ===== Footer ===== */
@@ -176,6 +178,7 @@
   align-items: center;
   margin-top: 1rem;
   flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .category {
@@ -196,6 +199,7 @@
 .solve-btn:hover {
   background: #00eaff;
   color: #0d1117;
+  transform: scale(1.05);
 }
 
 /* ===== No Results ===== */
@@ -204,14 +208,81 @@
   color: #9ca3af;
   margin-top: 2rem;
   font-style: italic;
+  font-size: 1rem;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .problems-header h1 {
-    font-size: 1.5rem;
+/* 📱 ===== Responsive Design ===== */
+
+/* Medium Screens */
+@media (max-width: 900px) {
+  .problems-header,
+  .problems-filter,
+  .problems-list {
+    max-width: 95%;
   }
+}
+
+/* Tablets & Phones */
+@media (max-width: 768px) {
+  .problems-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .problems-header h1 {
+    font-size: 1.6rem;
+    text-align: left;
+  }
+
   .back-btn {
-    margin-bottom: 1rem;
+    align-self: flex-start;
+    margin-top: 10px;
+  }
+
+  .problem-card {
+    padding: 1rem;
+  }
+
+  .problem-header h3 {
+    font-size: 1rem;
+  }
+
+  .problem-desc {
+    font-size: 0.88rem;
+  }
+
+  .solve-btn {
+    font-size: 0.9rem;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+  .problems-page {
+    padding: 1.5rem 0.8rem 3rem;
+  }
+
+  .problems-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .filter-tag {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+  }
+
+  .problem-card {
+    border-radius: 10px;
+    padding: 0.9rem;
+  }
+
+  .problem-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .category {
+    font-size: 0.85rem;
   }
 }

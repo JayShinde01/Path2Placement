@@ -1,12 +1,13 @@
-/* Home Page Styling */
+/* ===== Home Page Styling ===== */
 .home-page {
   font-family: "Poppins", sans-serif;
   background: #f9fafc;
   color: #222;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Hero Section */
+/* ===== Hero Section ===== */
 .hero-section {
   background: linear-gradient(135deg, #0052d4, #6fb1fc);
   color: white;
@@ -79,11 +80,11 @@
   background-color: #28b463;
 }
 
-/* Features Section */
+/* ===== Features Section ===== */
 .features-section {
   margin-top: 60px;
   text-align: center;
-  padding: 40px 20px;
+  padding: 40px 20px 80px;
 }
 
 .section-title {
@@ -124,12 +125,80 @@
   font-size: 0.95rem;
 }
 
-/* Responsive */
+/* ===== Responsive Design ===== */
+
+/* Large Tablets / Small Laptops */
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 2.3rem;
+  }
+
+  .hero-section {
+    padding: 100px 30px;
+  }
+
+  .features-section {
+    padding: 30px 15px 60px;
+  }
+}
+
+/* Tablets (≤768px) */
 @media (max-width: 768px) {
   .hero-title {
     font-size: 2rem;
   }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+
   .hero-section {
-    padding: 90px 15px;
+    padding: 90px 20px;
+  }
+
+  .features-grid {
+    gap: 20px;
+  }
+}
+
+/* Small Phones (≤480px) */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.7rem;
+    line-height: 1.4;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .btn {
+    padding: 10px 22px;
+    font-size: 0.9rem;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+  }
+
+  .feature-card {
+    padding: 20px;
+  }
+}
+
+/* Extra Small Phones (≤360px) */
+@media (max-width: 360px) {
+  .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    padding: 8px 18px;
+    font-size: 0.85rem;
   }
 }

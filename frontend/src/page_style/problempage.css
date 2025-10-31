@@ -1,3 +1,4 @@
+/* ===== Problem Page Layout ===== */
 .problem-container {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
@@ -6,15 +7,21 @@
   color: white;
   min-height: 100vh;
   padding: 20px;
+  font-family: "Poppins", sans-serif;
 }
 
+/* ===== Left Section (Problem Description) ===== */
 .problem-left {
   background: #1e293b;
   border-radius: 10px;
   padding: 20px;
   overflow-y: auto;
+  max-height: calc(100vh - 40px);
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
 }
 
+/* ===== Right Section (Editor + Output) ===== */
 .problem-right {
   background: #1e293b;
   border-radius: 10px;
@@ -24,9 +31,11 @@
   height: 85vh;
 }
 
+/* ===== Titles & Inputs ===== */
 .problem-title {
   font-size: 24px;
   margin-bottom: 10px;
+  font-weight: 600;
 }
 
 .language-select {
@@ -35,8 +44,10 @@
   border: 1px solid #334155;
   border-radius: 5px;
   padding: 6px 10px;
+  font-size: 0.95rem;
 }
 
+/* ===== Editor & Buttons ===== */
 .editor-container {
   flex: 1;
   border: 1px solid #334155;
@@ -53,16 +64,29 @@
   color: white;
   cursor: pointer;
   margin-right: 10px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .run-btn {
   background: #10b981;
 }
 
+.run-btn:hover {
+  background: #0ea171;
+  transform: scale(1.03);
+}
+
 .reset-btn {
   background: #3b82f6;
 }
 
+.reset-btn:hover {
+  background: #2563eb;
+  transform: scale(1.03);
+}
+
+/* ===== Output Box ===== */
 .output-box {
   background: #0f172a;
   border: 1px solid #334155;
@@ -70,8 +94,11 @@
   padding: 10px;
   margin-top: 15px;
   flex-shrink: 0;
+  font-family: "Courier New", monospace;
+  font-size: 0.95rem;
 }
 
+/* ===== Textarea Styling ===== */
 textarea {
   width: 100%;
   background: #0f172a;
@@ -80,14 +107,86 @@ textarea {
   border-radius: 6px;
   padding: 10px;
   resize: none;
+  font-family: "Courier New", monospace;
+  font-size: 0.95rem;
 }
 
-/* Responsive for small screens */
-@media (max-width: 900px) {
+/* ===== Scrollbar Customization ===== */
+.problem-left::-webkit-scrollbar {
+  width: 6px;
+}
+.problem-left::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+
+/* ===== Responsive Design ===== */
+
+/* Tablets (max 1024px) */
+@media (max-width: 1024px) {
   .problem-container {
     grid-template-columns: 1fr;
+    gap: 15px;
   }
+
   .problem-right {
     height: auto;
+  }
+
+  .problem-left,
+  .problem-right {
+    max-height: unset;
+  }
+}
+
+/* Small Tablets and Large Phones (max 768px) */
+@media (max-width: 768px) {
+  .problem-container {
+    padding: 15px;
+  }
+
+  .problem-title {
+    font-size: 20px;
+  }
+
+  .run-btn,
+  .reset-btn {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+
+  .language-select {
+    width: 100%;
+    margin-top: 10px;
+  }
+}
+
+/* Phones (max 480px) */
+@media (max-width: 480px) {
+  .problem-container {
+    padding: 12px;
+  }
+
+  .problem-left,
+  .problem-right {
+    padding: 15px;
+  }
+
+  .problem-title {
+    font-size: 18px;
+  }
+
+  .editor-container {
+    margin-top: 8px;
+  }
+
+  .output-box {
+    font-size: 0.85rem;
+  }
+
+  .run-btn,
+  .reset-btn {
+    width: 100%;
+    margin-bottom: 10px;
   }
 }

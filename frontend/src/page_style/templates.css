@@ -12,6 +12,7 @@
   font-weight: bold;
 }
 
+/* Grid Layout */
 .templates-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -19,6 +20,7 @@
   justify-items: center;
 }
 
+/* Card */
 .template-card {
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -35,12 +37,16 @@
   transform: translateY(-5px);
 }
 
+/* Image */
 .template-image {
   width: 100%;
+  height: auto;
   border-radius: 8px;
   margin-bottom: 15px;
+  object-fit: cover;
 }
 
+/* Button */
 .template-btn {
   width: 100%;
   background-color: #1a73e8;
@@ -55,4 +61,46 @@
 
 .template-btn:hover {
   background-color: #155ab6;
+}
+
+/* --------------------- RESPONSIVE DESIGN --------------------- */
+
+/* Tablets (<=1024px) */
+@media (max-width: 1024px) {
+  .templates-container {
+    padding: 15px;
+  }
+  .templates-title {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+  .templates-grid {
+    gap: 20px;
+  }
+  .template-card {
+    max-width: 300px;
+  }
+}
+
+/* Mobile devices (<=600px) */
+@media (max-width: 600px) {
+  .templates-container {
+    padding: 10px;
+    margin: 20px auto;
+  }
+  .templates-title {
+    font-size: 22px;
+  }
+  .templates-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .template-card {
+    padding: 12px;
+    max-width: 100%;
+  }
+  .template-btn {
+    font-size: 15px;
+    padding: 9px;
+  }
 }

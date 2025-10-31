@@ -1,5 +1,4 @@
 /* 🌟 Modern Glassmorphic UI — AI Resume Builder */
-
 .modern-home {
   font-family: "Poppins", sans-serif;
   background: linear-gradient(180deg, #f4f7ff 0%, #eef1f9 100%);
@@ -59,7 +58,6 @@
   background-color: #ffffff;
   color: #0047ab;
 }
-
 .primary-btn:hover {
   background-color: #e8efff;
   transform: translateY(-3px);
@@ -69,7 +67,6 @@
   background-color: #1e1e2f;
   color: #fff;
 }
-
 .secondary-btn:hover {
   background-color: #34364a;
   transform: translateY(-3px);
@@ -79,7 +76,6 @@
   background-color: #2ecc71;
   color: #fff;
 }
-
 .success-btn:hover {
   background-color: #28b463;
   transform: translateY(-3px);
@@ -108,7 +104,7 @@
   font-size: 1rem;
 }
 
-/* 📤 Upload Card (Glassmorphism Style) */
+/* 📤 Upload Card (Glassmorphism) */
 .upload-card {
   background: rgba(255, 255, 255, 0.8);
   border-radius: 18px;
@@ -117,7 +113,6 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
-
 .upload-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
@@ -141,11 +136,9 @@
   cursor: pointer;
   transition: 0.25s;
 }
-
 .upload-label:hover {
   background: #e2e9ff;
 }
-
 .upload-label input {
   display: none;
 }
@@ -166,6 +159,7 @@
   color: #333;
 }
 
+/* 📝 Textarea */
 textarea {
   border: 1px solid #dcdcdc;
   border-radius: 10px;
@@ -175,6 +169,7 @@ textarea {
   font-size: 1rem;
   line-height: 1.5;
   background: #fff;
+  width: 100%;
 }
 
 /* 🧾 Results Section */
@@ -186,17 +181,14 @@ textarea {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
   border-left: 6px solid #4a6cf7;
 }
-
 .score-high {
   color: #27ae60;
   font-weight: 700;
 }
-
 .score-medium {
   color: #f1c40f;
   font-weight: 700;
 }
-
 .score-low {
   color: #e74c3c;
   font-weight: 700;
@@ -205,29 +197,104 @@ textarea {
 .resume-style {
   margin: 20px 0;
 }
-
 .download-section {
   text-align: center;
   margin-top: 20px;
 }
 
 /* 📱 Responsive Design */
+
+/* Medium devices (tablets ≤1024px) */
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 2.6rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    max-width: 600px;
+  }
+
+  .ai-container {
+    padding: 0 15px;
+  }
+}
+
+/* Small devices (phones ≤768px) */
 @media (max-width: 768px) {
+  .hero-section {
+    padding: 80px 20px 100px;
+    border-radius: 0;
+  }
+
   .hero-title {
     font-size: 2.2rem;
   }
 
-  .hero-section {
-    padding: 80px 20px;
-    border-radius: 0;
+  .hero-subtitle {
+    font-size: 0.95rem;
   }
 
   .button-group {
     flex-direction: column;
     align-items: center;
+    gap: 15px;
   }
 
   .upload-card {
     padding: 22px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .section-desc {
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 260px;
+  }
+}
+
+/* Extra small devices (phones ≤480px) */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.9rem;
+    line-height: 1.3;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+    padding: 0 10px;
+  }
+
+  .upload-card {
+    padding: 18px;
+  }
+
+  textarea {
+    font-size: 0.9rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
+}
+
+/* Large screens (≥1400px) */
+@media (min-width: 1400px) {
+  .ai-container {
+    max-width: 1200px;
+  }
+
+  .hero-title {
+    font-size: 3.6rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
   }
 }

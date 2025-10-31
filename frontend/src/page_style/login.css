@@ -1,20 +1,21 @@
 /* ===== Login Page Background ===== */
 .login-page {
-  height: 100vh;
+  min-height: 100vh;
   background: linear-gradient(135deg, #3b82f6, #9333ea);
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: "Poppins", sans-serif;
+  padding: 20px;
 }
 
 /* ===== Login Card ===== */
 .login-container {
-  background: white;
+  background: #fff;
   width: 400px;
   padding: 40px 35px;
   border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   text-align: center;
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -30,6 +31,7 @@
 .login-subtitle {
   color: #6b7280;
   margin-bottom: 25px;
+  font-size: 1rem;
 }
 
 /* ===== Form ===== */
@@ -46,6 +48,7 @@
   font-size: 1rem;
   transition: border 0.3s;
 }
+
 .login-form input:focus {
   border-color: #3b82f6;
   outline: none;
@@ -54,7 +57,7 @@
 /* ===== Button ===== */
 .login-btn {
   background: linear-gradient(90deg, #3b82f6, #9333ea);
-  color: white;
+  color: #fff;
   border: none;
   padding: 12px;
   border-radius: 8px;
@@ -63,6 +66,7 @@
   cursor: pointer;
   transition: all 0.3s;
 }
+
 .login-btn:hover {
   opacity: 0.9;
   transform: scale(1.02);
@@ -80,20 +84,59 @@
   font-weight: 600;
   text-decoration: none;
 }
+
 .signup-link:hover {
   text-decoration: underline;
 }
 
 /* ===== Animation ===== */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== Responsive ===== */
+
+/* Tablets (≤768px) */
+@media (max-width: 768px) {
+  .login-container {
+    width: 85%;
+    padding: 35px 25px;
+  }
+
+  .login-title {
+    font-size: 1.6rem;
+  }
+
+  .login-subtitle {
+    font-size: 0.95rem;
+  }
+}
+
+/* Small Phones (≤480px) */
 @media (max-width: 480px) {
   .login-container {
-    width: 90%;
+    width: 95%;
     padding: 30px 20px;
+  }
+
+  .login-title {
+    font-size: 1.4rem;
+  }
+
+  .login-btn {
+    font-size: 0.95rem;
+    padding: 10px;
+  }
+
+  .login-form input {
+    padding: 10px;
+    font-size: 0.9rem;
   }
 }
