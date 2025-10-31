@@ -1,51 +1,98 @@
-import fitz # PyMuPDF library for PDF processing
-import docx # python-docx library for DOCX processing
 import os
-import tempfile # For creating temporary files securely
+import logging
+import tempfile
 import json
-import requests # For making HTTP requests (will still be used, but to Google API now)
-# Removed sklearn and spacy imports as matching logic will move to Gemini
-import logging # For logging application events and errors
+import requests
+import fitz  # PyMuPDF
+import docx  # python-docx
+import google.generativeai as genai  # ✅ Gemini SDK
 
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks # FastAPI core components
-from fastapi.middleware.cors import CORSMiddleware # For handling Cross-Origin Resource Sharing
-from fastapi.responses import FileResponse # For sending files as responses
-from pydantic import BaseModel # For data validation with request bodies
-from typing import List, Optional # For type hinting
-import uvicorn # ASGI server for running FastAPI
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+from typing import List, Optional
 from dotenv import load_dotenv
-load_dotenv()
-# --- Logging Configuration ---
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+import uvicorn
 
-# --- FastAPI Application Initialization ---
+
+load_dotenv()
+
+
+GOOGLE_GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
+if not GOOGLE_GEMINI_API_KEY:
+    raise ValueError("⚠️ GOOGLE_GEMINI_API_KEY not found in environment variables!")
+
+genai.configure(api_key=GOOGLE_GEMINI_API_KEY)
+
+# Optional: Print available models (for debug)
+for m in genai.list_models():
+    print(m.name)
+
+# Use the correct model name
+GEMINI_MODEL = "models/gemini-flash-latest"
+model = genai.GenerativeModel(GEMINI_MODEL)
+
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 app = FastAPI(
-    title="Resume Matcher & Generator API",
-    description="API for matching resumes against job descriptions and generating/improving resumes using AI."
+    title="Resume Matcher & Interview Assistant API",
+    description="AI-powered system for resume analysis and interactive mock interviews."
 )
 
-# --- CORS (Cross-Origin Resource Sharing) Setup ---
-# This allows your frontend application (e.g., React app running on localhost:3000)
-# to make requests to this backend API.
-# FIX: Ensure origins are clean string literals
-origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://localhost:5174"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],     # Allow all origins (frontend URLs)
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# --- USER AUTHENTICATION START ---
-users_db = {} # This is a simple in-memory store. For production, use a proper database.
+chat = model.start_chat(history=[
+    {
+        "role": "system",
+        "parts": "You are an AI interviewer. Ask professional interview questions and provide constructive feedback after each answer. Stay concise, realistic, and job-relevant."
+    }
+])
+
+class ChatRequest(BaseModel):
+    message: str
+
 
 class User(BaseModel):
     email: str
     password: str
-    name: str = None
+    name: Optional[str] = None
 
+
+
+users_db = {}
+
+@app.post("/interview")
+async def interview_chat(req: ChatRequest):
+    try:
+        # ✅ Use only valid Gemini roles
+        chat_session = model.start_chat(history=[
+            {"role": "user", "parts": "You are an AI interviewer. Ask professional interview questions and provide constructive feedback after each answer."}
+        ])
+        
+        response = chat_session.send_message(req.message)
+        return {"reply": response.text}
+
+    except Exception as e:
+        logging.error(f"Interview chat error: {e}", exc_info=True)
+        # Return a proper FastAPI HTTPException
+        raise HTTPException(status_code=500, detail=f"Interview chat failed: {e}")
 @app.post("/signup")
 def signup(user: User):
     if user.email in users_db:
@@ -60,7 +107,10 @@ def login(user: User):
         raise HTTPException(status_code=401, detail="Invalid credentials. Please check your email and password.")
     logging.info(f"User {user.email} logged in.")
     return {"success": True, "message": "Login successful."}
-# --- USER AUTHENTICATION END ---
+# --- USER AUTHENTICATION END --#
+################################################################################################################################
+
+
 
 
 # --- Helper Functions for Text Extraction ---
@@ -185,16 +235,11 @@ def generate_resume_from_json(data: dict):
     return doc
 
 
-# --- Google Gemini API Integration ---
-# Replace YOUR_GOOGLE_GEMINI_API_KEY with your actual Google Gemini API Key
- # Your API key 
-GOOGLE_GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-2.0-flash"
 
-# CRITICAL FIX: Define the URL as a literal string to prevent any markdown parsing issues.
-# Ensure no markdown brackets or parentheses are introduced here.
-GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
-logging.info(f"DEBUG: GEMINI_API_BASE_URL (global) is set to: '{GEMINI_API_BASE_URL}'")
+######################################################################################################################################
+
+
+
 
 
 @app.post("/match")

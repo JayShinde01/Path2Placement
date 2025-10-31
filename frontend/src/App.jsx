@@ -13,7 +13,7 @@ import ResumeBuilderFront from "./pages/ResumeBuilderFront";
 import ProblemsList from "./pages/ProblemsList";
 import ProblemPage from "./pages/ProblemPage";
 import CodingPracticeHome from "./pages/CodingPracticeHome";
-
+import Interview from "./pages/Interview"
 function App() {
  
 
@@ -29,6 +29,7 @@ function App() {
         <Route path="/resume" element={<ResumeBuilderFront />} />
         <Route path="/coding" element={<ProblemsList />} />
         <Route path="/problem/:id" element={<ProblemPage />} />
+        <Route path="/interview" element={<Interview />} />
         <Route path="/codinghome" element={<CodingPracticeHome />} />
         <Route path="/template/Template1" element={<Template1 />} />
         <Route path="/template/Template2" element={<Template2 />} />
