@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "../page_style/interview.css";
+import { ML_API_URL } from "../api";
 
 export default function Interview() {
   const [messages, setMessages] = useState([
@@ -73,7 +74,7 @@ export default function Interview() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/interview", {
+      const res = await fetch(`${ML_API_URL}interview`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text }),
