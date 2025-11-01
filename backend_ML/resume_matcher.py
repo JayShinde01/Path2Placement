@@ -1,118 +1,110 @@
+import fitz # PyMuPDF library for PDF processing
+import docx # python-docx library for DOCX processing
 import os
-import logging
-import tempfile
+import tempfile # For creating temporary files securely
 import json
-import requests
-import fitz  # PyMuPDF
-import docx  # python-docx
-import google.generativeai as genai  # ✅ Gemini SDK
-
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from pydantic import BaseModel
-from typing import List, Optional
+import requests # For making HTTP requests (will still be used, but to Google API now)
+# Removed sklearn and spacy imports as matching logic will move to Gemini
+import logging # For logging application events and errors
+import google.generativeai as genai
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks # FastAPI core components
+from fastapi.middleware.cors import CORSMiddleware # For handling Cross-Origin Resource Sharing
+from fastapi.responses import FileResponse # For sending files as responses
+from pydantic import BaseModel # For data validation with request bodies
+from typing import List, Optional # For type hinting
+import uvicorn # ASGI server for running FastAPI
 from dotenv import load_dotenv
-import uvicorn
-
-
 load_dotenv()
+# --- Logging Configuration ---
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
-GOOGLE_GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
-if not GOOGLE_GEMINI_API_KEY:
-    raise ValueError("⚠️ GOOGLE_GEMINI_API_KEY not found in environment variables!")
-
-genai.configure(api_key=GOOGLE_GEMINI_API_KEY)
-
-# Optional: Print available models (for debug)
-for m in genai.list_models():
-    print(m.name)
-
-# Use the correct model name
-GEMINI_MODEL = "models/gemini-flash-latest"
-model = genai.GenerativeModel(GEMINI_MODEL)
-
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
+# --- FastAPI Application Initialization ---
 app = FastAPI(
-    title="Resume Matcher & Interview Assistant API",
-    description="AI-powered system for resume analysis and interactive mock interviews."
+    title="Resume Matcher & Generator API",
+    description="API for matching resumes against job descriptions and generating/improving resumes using AI."
 )
+# --- Google Gemini API Integration ---
+# Replace YOUR_GOOGLE_GEMINI_API_KEY with your actual Google Gemini API Key
+ # Your API key 
+GOOGLE_GEMINI_API_KEY = 'AIzaSyC6RPdtZnr5CDQiv9UNPtZ827ZRUiFMdLg'
+GEMINI_MODEL = "gemini-2.0-flash"
 
+# CRITICAL FIX: Define the URL as a literal string to prevent any markdown parsing issues.
+# Ensure no markdown brackets or parentheses are introduced here.
+GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+logging.info(f"DEBUG: GEMINI_API_BASE_URL (global) is set to: '{GOOGLE_GEMINI_API_KEY}'")
 
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://pathtoplacement.netlify.app"
-]
-
+# --- CORS (Cross-Origin Resource Sharing) Setup ---
+# This allows your frontend application (e.g., React app running on localhost:3000)
+# to make requests to this backend API.
+# FIX: Ensure origins are clean string literals
+origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # In production, specify allowed origins
+    allow_origins=["*"],     # Allow all origins (frontend URLs)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-chat = model.start_chat(history=[
-    {
-        "role": "system",
-        "parts": "You are an AI interviewer. Ask professional interview questions and provide constructive feedback after each answer. Stay concise, realistic, and job-relevant."
-    }
-])
+# --- USER AUTHENTICATION START ---
+# users_db = {} # This is a simple in-memory store. For production, use a proper database.
 
-class ChatRequest(BaseModel):
+# class User(BaseModel):
+#     email: str
+#     password: str
+#     name: str = None
+
+# @app.post("/signup")
+# def signup(user: User):
+#     if user.email in users_db:
+#         raise HTTPException(status_code=400, detail="User already exists")
+#     users_db[user.email] = user.password # Store password (in a real app, hash this!)
+#     logging.info(f"User {user.email} signed up.")
+#     return {"success": True, "message": "User registered successfully."}
+
+# @app.post("/login")
+# def login(user: User):
+#     if user.email not in users_db or users_db[user.email] != user.password:
+#         raise HTTPException(status_code=401, detail="Invalid credentials. Please check your email and password.")
+#     logging.info(f"User {user.email} logged in.")
+#     return {"success": True, "message": "Login successful."}
+# # --- USER AUTHENTICATION END ---
+
+
+
+
+# Request body model
+class InterviewRequest(BaseModel):
     message: str
 
-
-class User(BaseModel):
-    email: str
-    password: str
-    name: Optional[str] = None
-
-
-
-users_db = {}
-
 @app.post("/interview")
-async def interview_chat(req: ChatRequest):
+async def interview(req: InterviewRequest):
     try:
-        # ✅ Use only valid Gemini roles
-        chat_session = model.start_chat(history=[
-            {"role": "user", "parts": "You are an AI interviewer. Ask professional interview questions and provide constructive feedback after each answer."}
-        ])
-        
-        response = chat_session.send_message(req.message)
-        return {"reply": response.text}
+        print("in /interview api")
+
+        # ✅ Configure the Gemini API first
+        genai.configure(api_key=GOOGLE_GEMINI_API_KEY)
+
+        # Create a prompt for the AI interviewer
+        prompt = f"""
+        You are an AI interviewer helping a candidate prepare for technical interviews.
+        Respond conversationally but professionally.
+        The user said: "{req.message}"
+        Your reply should be short (2-3 sentences), encouraging, and relevant.
+        """
+
+        # Use the Gemini model
+        model = genai.GenerativeModel(GEMINI_MODEL)
+        response = model.generate_content(prompt)
+
+        ai_reply = response.text.strip() if hasattr(response, "text") else "Sorry, I couldn’t generate a reply."
+        return {"reply": ai_reply}
 
     except Exception as e:
-        logging.error(f"Interview chat error: {e}", exc_info=True)
-        # Return a proper FastAPI HTTPException
-        raise HTTPException(status_code=500, detail=f"Interview chat failed: {e}")
-@app.post("/signup")
-def signup(user: User):
-    if user.email in users_db:
-        raise HTTPException(status_code=400, detail="User already exists")
-    users_db[user.email] = user.password # Store password (in a real app, hash this!)
-    logging.info(f"User {user.email} signed up.")
-    return {"success": True, "message": "User registered successfully."}
-
-@app.post("/login")
-def login(user: User):
-    if user.email not in users_db or users_db[user.email] != user.password:
-        raise HTTPException(status_code=401, detail="Invalid credentials. Please check your email and password.")
-    logging.info(f"User {user.email} logged in.")
-    return {"success": True, "message": "Login successful."}
-# --- USER AUTHENTICATION END --#
-################################################################################################################################
-
-
-
+        logging.error(f"Interview route error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # --- Helper Functions for Text Extraction ---
 
@@ -234,11 +226,6 @@ def generate_resume_from_json(data: dict):
                 doc.add_paragraph(project['description'].strip(), style='ListBullet')
 
     return doc
-
-
-
-######################################################################################################################################
-
 
 
 
@@ -655,7 +642,10 @@ Return only valid JSON in this exact structure, without any additional text, mar
             os.remove(temp_filepath) # Ensure cleanup even if saving fails
         raise HTTPException(status_code=500, detail=f"Failed to generate AI resume DOCX: {e}")
 
-port = os.getenv("PORT", 8000)
+
+
+
+port = int(os.getenv("PORT", 8000))
 # --- Main Entry Point ---
 # Runs the FastAPI application using Uvicorn.
 if __name__ == "__main__":
