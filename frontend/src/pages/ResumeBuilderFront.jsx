@@ -92,7 +92,7 @@ export default function ResumeBuilderFront() {
       formData.append("resume_style", resumeStyle);
 
       const res = await axios.post(
-        `${ML_API_URl}generate_tailored_resume`,
+        `${ML_API_URL}generate_tailored_resume`,
         formData,
         { responseType: "blob" }
       );
