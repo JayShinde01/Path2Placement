@@ -114,17 +114,45 @@ export default function Interview() {
   return (
     <div className="interview-page">
       <motion.header
-        className="interview-header"
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
+  className="interview-header"
+  initial={{ opacity: 0, y: -8 }}
+  animate={{ opacity: 1, y: 0 }}
+>
+  <div className="header-left">
+    <button
+      className="back-btn"
+      onClick={() => window.history.back()}
+      title="Go back"
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <div className="brand">PlacementAI</div>
-        <div className="header-actions">
-          <button className="icon-btn" title="Voice help" onClick={() => speak("Ask me anything. I'm ready to interview you.")}>
-            🔊
-          </button>
-        </div>
-      </motion.header>
+        <path
+          d="M15 18L9 12L15 6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+    <div className="brand">PlacementAI</div>
+  </div>
+
+  <div className="header-actions">
+    <button
+      className="icon-btn"
+      title="Voice help"
+      onClick={() => speak("Ask me anything. I'm ready to interview you.")}
+    >
+      🔊
+    </button>
+  </div>
+</motion.header>
+
 
       <main className="interview-main">
         <div className="conversation-shell">

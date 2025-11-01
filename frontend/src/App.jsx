@@ -14,6 +14,8 @@ import ProblemsList from "./pages/ProblemsList";
 import ProblemPage from "./pages/ProblemPage";
 import CodingPracticeHome from "./pages/CodingPracticeHome";
 import Interview from "./pages/Interview"
+import Reports from "./pages/Reports";
+import JobRecommendation from "./pages/JobRecommendation";
 function App() {
  
 
@@ -31,6 +33,8 @@ function App() {
         <Route path="/problem/:id" element={<ProblemPage />} />
         <Route path="/interview" element={<Interview />} />
         <Route path="/codinghome" element={<CodingPracticeHome />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/job-recommendation" element={<JobRecommendation />} />
         <Route path="/template/Template1" element={<Template1 />} />
         <Route path="/template/Template2" element={<Template2 />} />
         <Route path="/template/Template3" element={<Template3 />} />

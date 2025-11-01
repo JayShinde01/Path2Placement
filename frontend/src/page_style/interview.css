@@ -229,3 +229,45 @@ body{
   .bubble-wrap{ max-width:100% }
   .brand{ font-size:18px}
 }
+/* Header container alignment fix */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Back button styling */
+.back-btn {
+  background: var(--glass);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.back-btn:hover {
+  background: rgba(47, 128, 237, 0.15);
+  color: #fff;
+  transform: translateX(-2px);
+  box-shadow: 0 0 12px rgba(47, 128, 237, 0.25);
+}
+
+.back-btn:active {
+  transform: scale(0.96);
+}
+
+/* Fix brand highlight or selection look */
+.brand {
+  font-weight: 700;
+  font-size: 20px;
+  color: #e9f1f7;
+  letter-spacing: 0.2px;
+  user-select: none; /* prevent blue selection look */
+  background: none !important; /* ensure no blue bg highlight */
+}

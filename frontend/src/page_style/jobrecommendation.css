@@ -1,0 +1,120 @@
+:root {
+  --bg: #0f1113;
+  --glass: rgba(255, 255, 255, 0.03);
+  --accent: #2f80ed;
+  --muted: #9aa4ad;
+  --text: #e6eef3;
+}
+
+.jobrec-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0b0c0d 0%, #0f1113 100%);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Header */
+.jobrec-header {
+  width: 100%;
+  padding: 22px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.back-btn {
+  color: var(--muted);
+  background: var(--glass);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 8px 14px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.back-btn:hover {
+  background: rgba(47, 128, 237, 0.15);
+  color: #fff;
+  transform: translateX(-3px);
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--text);
+  user-select: none;
+}
+
+/* Main section */
+.jobrec-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.jobrec-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 50px 60px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  max-width: 600px;
+}
+
+.jobrec-card h1 {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.jobrec-card p {
+  color: var(--muted);
+  font-size: 16px;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+/* Loader */
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  margin: 20px auto;
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Home button */
+.home-btn {
+  display: inline-block;
+  margin-top: 16px;
+  background: var(--accent);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.25s ease;
+}
+
+.home-btn:hover {
+  background: #1f5bd8;
+}
+
+/* Footer */
+.footer-note {
+  font-size: 13px;
+  color: var(--muted);
+  padding-bottom: 20px;
+}
