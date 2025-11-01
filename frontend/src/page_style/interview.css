@@ -223,7 +223,7 @@ body{
 
 /* responsive */
 @media (max-width:720px){
-  .conversation-shell{ height: calc(100vh - 220px); padding:18px; border-radius:14px; }
+  .conversation-shell{ height: calc(100vh - 300px); padding:18px; border-radius:14px; }
   .input-bar{ padding:10px; width:96%; border-radius:20px; }
   .avatar{ display:none }
   .bubble-wrap{ max-width:100% }
