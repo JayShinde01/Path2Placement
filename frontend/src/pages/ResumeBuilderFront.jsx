@@ -61,7 +61,7 @@ export default function ResumeBuilderFront() {
     setResult(null);
 
     try {
-      const res = await axios.post(`${ML_API_URl}match`, formData, {
+      const res = await axios.post(`${ML_API_URL}match`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResult(res.data);
