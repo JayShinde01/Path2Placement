@@ -26,7 +26,7 @@ app = FastAPI(
 # --- Google Gemini API Integration ---
 # Replace YOUR_GOOGLE_GEMINI_API_KEY with your actual Google Gemini API Key
  # Your API key 
-GOOGLE_GEMINI_API_KEY = 'AIzaSyC6RPdtZnr5CDQiv9UNPtZ827ZRUiFMdLg'
+GOOGLE_GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
 GEMINI_MODEL = "gemini-2.0-flash"
 
 # CRITICAL FIX: Define the URL as a literal string to prevent any markdown parsing issues.
