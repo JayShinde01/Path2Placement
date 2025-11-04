@@ -1,23 +1,7 @@
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Virtual environments
 venv/
-ENV/
-env/
-
-# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
-# Databases and temp files
 *.db
-*.sqlite3
-*.log
-temp/
+.env
