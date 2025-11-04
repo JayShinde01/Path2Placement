@@ -102,6 +102,8 @@ const Template2 = () => {
         border: "2px solid #333",
         padding: "30px",
         borderRadius: "10px",
+        background:"#f9f9f9",
+        color: "#000",
         lineHeight: 1.5
       }}
     >

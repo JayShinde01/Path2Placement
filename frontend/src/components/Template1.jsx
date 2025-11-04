@@ -54,7 +54,7 @@ export default function Template1() {
         minHeight: "1150px",
         margin: "0 auto",
         fontFamily: "Calibri, Arial, sans-serif",
-        color: "#222",
+        color: "#000000ff",
         lineHeight: "1.5",
         border: "1px solid #ccc",
       }}
@@ -102,7 +102,7 @@ export default function Template1() {
       </div>
 
       {/* RIGHT */}
-      <div style={{ padding: "30px" }}>
+      <div style={{ padding: "30px" ,background:"rgba(255, 255, 255, 1)"}}>
         <h1 style={{ margin: "0", fontSize: "28px" }}>{data.right.name}</h1>
         <p style={{ fontSize: "15px", margin: "4px 0 12px", color: "#1f4e8c" }}>
           {data.right.title}
