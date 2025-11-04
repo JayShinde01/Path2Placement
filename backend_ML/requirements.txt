@@ -18,3 +18,4 @@ google-generativeai==0.8.3
 
 # --- Optional (Logging & Async Utilities) ---
 loguru==0.7.2
+youtube-transcript-api==0.6.2

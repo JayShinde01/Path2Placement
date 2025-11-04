@@ -7,12 +7,13 @@ import requests # For making HTTP requests (will still be used, but to Google AP
 # Removed sklearn and spacy imports as matching logic will move to Gemini
 import logging # For logging application events and errors
 import google.generativeai as genai
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks # FastAPI core components
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks,Query # FastAPI core components
 from fastapi.middleware.cors import CORSMiddleware # For handling Cross-Origin Resource Sharing
 from fastapi.responses import FileResponse # For sending files as responses
 from pydantic import BaseModel # For data validation with request bodies
 from typing import List, Optional # For type hinting
 import uvicorn # ASGI server for running FastAPI
+from job_apis import fetch_jobs
 from dotenv import load_dotenv
 load_dotenv()
 # --- Logging Configuration ---
@@ -71,6 +72,20 @@ app.add_middleware(
 #     logging.info(f"User {user.email} logged in.")
 #     return {"success": True, "message": "Login successful."}
 # # --- USER AUTHENTICATION END ---
+
+
+
+
+
+@app.get("/jobs")
+def get_jobs(query: str = Query(..., description="Job title or skill"),
+             location: str = Query("India", description="Job location")):
+    jobs = fetch_jobs(query, location)
+    if not jobs:
+        return {"message": "No jobs found"}
+    return {"total": len(jobs), "results": jobs}
+
+
 
 
 
