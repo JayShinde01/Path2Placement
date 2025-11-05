@@ -16,7 +16,7 @@ export default function JobRecommendation() {
     setLoading(true);
     try {
       const response = await fetch(
-        `${ML_API_URL}/jobs?query=${query}&location=${location}`
+        `${ML_API_URL}jobs?query=${query}&location=${location}`
       );
       const data = await response.json();
       setJobs(data.results || []);
