@@ -35,7 +35,7 @@ export default function JobRecommendation() {
   const filteredJobs = jobs.filter((job) =>
     source === "all" ? true : job.source?.toLowerCase() === source.toLowerCase()
   );
-//
+
   return (
     <motion.div
       className="jobrec-page"
