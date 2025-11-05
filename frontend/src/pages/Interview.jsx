@@ -12,7 +12,7 @@ export default function Interview() {
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef(null);
   const bottomRef = useRef(null);
-
+console.log("Rendering Interview component",localStorage.getItem("userName"));
   // Scroll to bottom whenever messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -77,7 +77,7 @@ export default function Interview() {
       const res = await fetch(`${ML_API_URL}interview`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ user_id: localStorage.getItem("userName")|| 'guest' , message: text }),
       });
 
       if (!res.ok) {

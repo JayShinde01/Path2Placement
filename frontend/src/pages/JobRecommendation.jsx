@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import "../page_style/jobrecommendation.css";
+import { ML_API_URL } from "../api";
 
 export default function JobRecommendation() {
   const [jobs, setJobs] = useState([]);
@@ -15,7 +16,7 @@ export default function JobRecommendation() {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/jobs?query=${query}&location=${location}`
+        `${ML_API_URL}/jobs?query=${query}&location=${location}`
       );
       const data = await response.json();
       setJobs(data.results || []);

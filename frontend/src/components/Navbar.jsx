@@ -24,7 +24,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="logo">
         <h2>
-          Placement<span>AI</span>
+          Path<span>2</span>Place
         </h2>
       </div>
 
