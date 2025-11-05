@@ -73,7 +73,9 @@ app.add_middleware(
 #     return {"success": True, "message": "Login successful."}
 # # --- USER AUTHENTICATION END ---
 
-
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Resume Matcher & Generator API"} 
 
 
 
@@ -120,6 +122,10 @@ async def interview(req: InterviewRequest):
     except Exception as e:
         logging.error(f"Interview route error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+        
 
 # --- Helper Functions for Text Extraction ---
 
