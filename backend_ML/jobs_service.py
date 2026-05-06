@@ -10,7 +10,6 @@ ADZUNA_APP_KEY = os.getenv("ADZUNA_APP_KEY")
 JOOBLE_API_KEY = os.getenv("JOOBLE_API_KEY")
 
 
-# 🔥 1. Fetch jobs (same as yours, but cleaner)
 def fetch_jobs(query, location="India"):
     all_jobs = []
 
@@ -83,7 +82,7 @@ def fetch_jobs(query, location="India"):
     return all_jobs
 
 
-# 🔥 2. Remove duplicate jobs
+# 🔥 Remove duplicates
 def deduplicate_jobs(jobs):
     seen = set()
     unique = []
@@ -97,18 +96,17 @@ def deduplicate_jobs(jobs):
     return unique
 
 
-# 🔥 3. Score jobs based on skills
+# 🔥 Score jobs using skills
 def score_job(job, skills):
     text = (job["title"] + " " + job.get("description", "")).lower()
     score = 0
-
     matched = 0
+
     for skill in skills:
         if skill.lower() in text:
             score += 2
             matched += 1
 
-    # bonus
     if "fresher" in text or "junior" in text:
         score += 1
 
@@ -118,19 +116,19 @@ def score_job(job, skills):
     return score, match_percent
 
 
-# 🔥 4. Recommend jobs
+# 🔥 Main function
 def recommend_jobs(query, location, skills):
     jobs = fetch_jobs(query, location)
     jobs = deduplicate_jobs(jobs)
 
-    scored = []
+    scored_jobs = []
+
     for job in jobs:
         score, match = score_job(job, skills)
         job["score"] = score
         job["match"] = match
-        scored.append(job)
+        scored_jobs.append(job)
 
-    # sort by best match
-    scored.sort(key=lambda x: x["score"], reverse=True)
+    scored_jobs.sort(key=lambda x: x["score"], reverse=True)
 
-    return scored[:30]
+    return scored_jobs[:30]

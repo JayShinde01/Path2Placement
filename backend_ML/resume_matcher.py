@@ -56,29 +56,6 @@ GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 logging.info("DEBUG: GEMINI_API initialized securely.")
 
-# --- USER AUTHENTICATION START ---
-# users_db = {} # This is a simple in-memory store. For production, use a proper database.
-
-# class User(BaseModel):
-#     email: str
-#     password: str
-#     name: str = None
-
-# @app.post("/signup")
-# def signup(user: User):
-#     if user.email in users_db:
-#         raise HTTPException(status_code=400, detail="User already exists")
-#     users_db[user.email] = user.password # Store password (in a real app, hash this!)
-#     logging.info(f"User {user.email} signed up.")
-#     return {"success": True, "message": "User registered successfully."}
-
-# @app.post("/login")
-# def login(user: User):
-#     if user.email not in users_db or users_db[user.email] != user.password:
-#         raise HTTPException(status_code=401, detail="Invalid credentials. Please check your email and password.")
-#     logging.info(f"User {user.email} logged in.")
-#     return {"success": True, "message": "Login successful."}
-# # --- USER AUTHENTICATION END ---
 
 @app.get("/")
 def read_root():
@@ -86,13 +63,6 @@ def read_root():
 
 
 
-@app.get("/jobs")
-def get_jobs(query: str = Query(..., description="Job title or skill"),
-             location: str = Query("India", description="Job location")):
-    jobs = fetch_jobs(query, location)
-    if not jobs:
-        return {"message": "No jobs found"}
-    return {"total": len(jobs), "results": jobs}
 
 
 
@@ -772,3 +742,25 @@ async def delete_resume(
         raise HTTPException(status_code=404, detail="Resume not found")
     return None
 
+@app.put("/api/resumes/{resume_id}")
+async def update_resume(
+    resume_id: str,
+    body: ResumeCreateBody,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    oid = _ObjectId(resume_id)
+
+    result = await db["resumes"].update_one(
+        {"_id": oid, "user_id": str(current_user["_id"])},
+        {"$set": {
+            "templateId": body.templateId,
+            "data": body.data,
+            "updated_at": datetime.now(_tz.utc)
+        }}
+    )
+
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Resume not found")
+
+    return {"msg": "Updated"}

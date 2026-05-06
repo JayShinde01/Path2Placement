@@ -6,7 +6,6 @@ import Navbar from "../components/Navbar";
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  // ✅ Default structure
   const defaultData = {
     personal: {
       name: "",
@@ -29,25 +28,42 @@ export default function Dashboard() {
   };
 
   const [data, setData] = useState(defaultData);
+  const [loading, setLoading] = useState(true);
 
-  // ✅ Check login and load saved data
+  const token = localStorage.getItem("token");
+
+  // ✅ Load resume from backend
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!token) {
       navigate("/login");
-    } else {
-      const saved = localStorage.getItem("resumeData");
-      console.log(saved);
-      
-      if (saved) {
-        try {
-          setData(JSON.parse(saved));
-        } catch {
-          setData(defaultData);
-        }
-      }
+      return;
     }
-  }, [navigate]);
 
+    const fetchResume = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/resumes", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const result = await res.json();
+
+        // 👉 If user already has resume, load latest
+        if (result.length > 0) {
+          setData(result[0].data);
+        }
+      } catch (err) {
+        console.error("Error loading resume:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResume();
+  }, [navigate, token]);
+
+  // 🟢 Handlers
   const handlePersonalChange = (e) => {
     const { name, value } = e.target;
     setData((prev) => ({
@@ -84,12 +100,30 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ Save & update localStorage
-  const handleSubmit = (e) => {
+  // ✅ Save to backend (NOT localStorage)
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem("resumeData", JSON.stringify(data));
-    navigate("/templates");
+
+    try {
+      await fetch("http://localhost:8000/api/resumes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          templateId: "Template1", // later dynamic
+          data: data,
+        }),
+      });
+
+      navigate("/templates");
+    } catch (err) {
+      console.error("Error saving resume:", err);
+    }
   };
+
+  if (loading) return <h2>Loading...</h2>;
 
   return (
     <>
@@ -98,7 +132,8 @@ export default function Dashboard() {
         <h1 className="dashboard-title">Resume Builder Dashboard</h1>
 
         <form onSubmit={handleSubmit} className="dashboard-form">
-          {/* PERSONAL INFO */}
+
+          {/* PERSONAL */}
           <section className="form-section">
             <h2>Personal Information</h2>
             <div className="form-grid">
@@ -107,7 +142,7 @@ export default function Dashboard() {
                   key={key}
                   type="text"
                   name={key}
-                  placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                  placeholder={key}
                   value={data.personal[key]}
                   onChange={handlePersonalChange}
                 />
@@ -121,19 +156,13 @@ export default function Dashboard() {
             {data.skills.map((skill, i) => (
               <input
                 key={i}
-                type="text"
-                placeholder={`Skill ${i + 1}`}
                 value={skill}
                 onChange={(e) =>
                   handleArrayChange("skills", i, e.target.value)
                 }
               />
             ))}
-            <button
-              type="button"
-              onClick={() => addField("skills")}
-              className="add-btn"
-            >
+            <button type="button" onClick={() => addField("skills")}>
               + Add Skill
             </button>
           </section>
@@ -142,13 +171,12 @@ export default function Dashboard() {
           <section className="form-section">
             <h2>Experience</h2>
             {data.experience.map((exp, i) => (
-              <div key={i} className="nested-card">
+              <div key={i}>
                 {Object.keys(exp).map((key) => (
                   <input
                     key={key}
-                    type="text"
-                    placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                     value={exp[key]}
+                    placeholder={key}
                     onChange={(e) =>
                       handleObjectArrayChange("experience", i, key, e.target.value)
                     }
@@ -156,11 +184,7 @@ export default function Dashboard() {
                 ))}
               </div>
             ))}
-            <button
-              type="button"
-              onClick={() => addField("experience", "object")}
-              className="add-btn"
-            >
+            <button type="button" onClick={() => addField("experience", "object")}>
               + Add Experience
             </button>
           </section>
@@ -169,13 +193,12 @@ export default function Dashboard() {
           <section className="form-section">
             <h2>Education</h2>
             {data.education.map((edu, i) => (
-              <div key={i} className="nested-card">
+              <div key={i}>
                 {Object.keys(edu).map((key) => (
                   <input
                     key={key}
-                    type="text"
-                    placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                     value={edu[key]}
+                    placeholder={key}
                     onChange={(e) =>
                       handleObjectArrayChange("education", i, key, e.target.value)
                     }
@@ -183,11 +206,7 @@ export default function Dashboard() {
                 ))}
               </div>
             ))}
-            <button
-              type="button"
-              onClick={() => addField("education", "object")}
-              className="add-btn"
-            >
+            <button type="button" onClick={() => addField("education", "object")}>
               + Add Education
             </button>
           </section>
@@ -196,13 +215,12 @@ export default function Dashboard() {
           <section className="form-section">
             <h2>Projects</h2>
             {data.projects.map((proj, i) => (
-              <div key={i} className="nested-card">
+              <div key={i}>
                 {Object.keys(proj).map((key) => (
                   <input
                     key={key}
-                    type="text"
-                    placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                     value={proj[key]}
+                    placeholder={key}
                     onChange={(e) =>
                       handleObjectArrayChange("projects", i, key, e.target.value)
                     }
@@ -210,47 +228,33 @@ export default function Dashboard() {
                 ))}
               </div>
             ))}
-            <button
-              type="button"
-              onClick={() => addField("projects", "object")}
-              className="add-btn"
-            >
+            <button type="button" onClick={() => addField("projects", "object")}>
               + Add Project
             </button>
           </section>
 
-          {/* OTHER SECTIONS */}
+          {/* OTHER */}
           {["certifications", "achievements", "activities", "languages"].map(
             (section) => (
-              <section key={section} className="form-section">
-                <h2>
-                  {section.charAt(0).toUpperCase() + section.slice(1)}
-                </h2>
+              <section key={section}>
+                <h2>{section}</h2>
                 {data[section].map((item, i) => (
                   <input
                     key={i}
-                    type="text"
-                    placeholder={`${section.slice(0, -1)} ${i + 1}`}
                     value={item}
                     onChange={(e) =>
                       handleArrayChange(section, i, e.target.value)
                     }
                   />
                 ))}
-                <button
-                  type="button"
-                  onClick={() => addField(section)}
-                  className="add-btn"
-                >
-                  + Add {section.slice(0, -1)}
+                <button type="button" onClick={() => addField(section)}>
+                  + Add
                 </button>
               </section>
             )
           )}
 
-          <button type="submit" className="submit-btn">
-            Save & Continue to Templates
-          </button>
+          <button type="submit">Save & Continue</button>
         </form>
       </div>
     </>

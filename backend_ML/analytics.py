@@ -42,6 +42,84 @@ def _now() -> datetime:
 def _uid(user: dict) -> str:
     return str(user["_id"])
 
+def safe_date(val):
+    """Synchronous helper for sorting by date."""
+    if isinstance(val, datetime):
+        return val
+
+    if isinstance(val, str):
+        try:
+            return datetime.fromisoformat(val)
+        except ValueError:
+            return datetime.min.replace(tzinfo=timezone.utc)
+
+    return datetime.min.replace(tzinfo=timezone.utc)
+
+def _build_recommendations(
+    avg_resume: int,
+    coding_acc: int,
+    interview_sessions: int,
+    missing_skills: list[str],
+    user_skills: set[str],
+) -> list[dict]:
+    """Generate actionable recommendations based on user data."""
+    recs = []
+
+    if avg_resume < 60:
+        recs.append({
+            "area": "Resume",
+            "priority": "high",
+            "action": "Your resume match score is below 60%. Upload your resume against more job descriptions and add the missing skills highlighted in the gap analysis.",
+        })
+    elif avg_resume < 80:
+        recs.append({
+            "area": "Resume",
+            "priority": "medium",
+            "action": f"Resume score is {avg_resume}%. Focus on adding: {', '.join(missing_skills[:4]) or 'the skills shown in the gap analysis'}.",
+        })
+
+    if coding_acc < 50:
+        recs.append({
+            "area": "Coding",
+            "priority": "high",
+            "action": "Coding accuracy is below 50%. Practice Easy problems daily to build confidence before attempting Medium difficulty.",
+        })
+    elif coding_acc < 75:
+        recs.append({
+            "area": "Coding",
+            "priority": "medium",
+            "action": "Good coding progress! Push to Medium and Hard problems to stand out in technical interviews.",
+        })
+
+    if interview_sessions < 3:
+        recs.append({
+            "area": "Interview",
+            "priority": "high",
+            "action": "You've done fewer than 3 mock interview sessions. Practice daily — consistency is the fastest way to improve communication and confidence.",
+        })
+
+    # High-demand skills the user doesn't have
+    high_demand_missing = [
+        ms["skill"] for ms in MARKET_SKILLS
+        if ms["demand"] >= 80 and ms["skill"].lower() not in user_skills
+    ][:4]
+    if high_demand_missing:
+        recs.append({
+            "area": "Skills",
+            "priority": "high",
+            "action": f"High-demand skills you're missing: {', '.join(high_demand_missing)}. Adding even one of these significantly improves your market value.",
+        })
+
+    if not recs:
+        recs.append({
+            "area": "General",
+            "priority": "low",
+            "action": "Great progress! Keep practicing coding, run more resume scans against real job descriptions, and do mock interviews weekly.",
+        })
+
+    return recs
+
+
 # ---------------------------------------------------------------------------
 # Pydantic models — inbound
 # ---------------------------------------------------------------------------
@@ -266,7 +344,6 @@ async def get_analytics_summary(
 
     if session_docs:
         total_sessions = len(session_docs)
-        feedback_msgs = [d["final_feedback"] for d in session_docs if d.get("final_feedback")]
         roles_practiced = list({d["role"] for d in session_docs if d.get("role")})
     else:
         interview_cursor = db["interview_reviews"].find(
@@ -276,16 +353,12 @@ async def get_analytics_summary(
         total_sessions = len({
             d.get("session_id") or d["created_at"].strftime("%Y-%m-%d") for d in interview_docs
         }) if interview_docs else 0
-        feedback_msgs = [
-            d["ai_reply"] for d in interview_docs if d.get("is_feedback")
-        ]
         roles_practiced = list({
             d["role"] for d in interview_docs if d.get("role")
         })
 
     # ── 4. Job applications ───────────────────────────────────────────────
-    jobs_cursor = db["job_applications"].find({"user_id": uid})
-    jobs_docs = await jobs_cursor.to_list(length=500)
+    jobs_docs = await db["job_applications"].find({"user_id": uid}).to_list(length=500)
 
     total_jobs_saved = len(jobs_docs)
     source_counts: dict[str, int] = {}
@@ -293,137 +366,58 @@ async def get_analytics_summary(
         src = d.get("source", "Unknown")
         source_counts[src] = source_counts.get(src, 0) + 1
 
+    # Sort using the synchronous helper
+    sorted_jobs = sorted(
+        jobs_docs,
+        key=lambda x: safe_date(x.get("created_at")),
+        reverse=True
+    )
+
     recent_jobs = [
         {
-            "title":   d.get("job_title", ""),
+            "title": d.get("job_title", ""),
             "company": d.get("company", ""),
-            "source":  d.get("source", ""),
+            "source": d.get("source", ""),
         }
-        for d in sorted(jobs_docs, key=lambda x: x["created_at"], reverse=True)[:5]
+        for d in sorted_jobs[:5]
     ]
 
-    # ── 5. Skill gap vs market ────────────────────────────────────────────
-    user_skills_set = {s.lower() for s in matched_skill_counts.keys()}
-    skill_gap = []
-    for ms in MARKET_SKILLS:
-        have = ms["skill"].lower() in user_skills_set
-        skill_gap.append({
-            "skill":    ms["skill"],
-            "demand":   ms["demand"],
-            "category": ms["category"],
-            "have":     have,
-        })
-
-    # ── 6. Readiness score ────────────────────────────────────────────────
-    # Weighted composite: resume 40%, coding 30%, interview 30%
-    resume_component   = min(avg_resume_score, 100) * 0.40
-    coding_component   = min(accuracy_pct, 100)     * 0.30
-    interview_component = min(total_sessions * 10, 100) * 0.30
-    readiness_score = round(resume_component + coding_component + interview_component)
-
-    # ── 7. AI recommendations ─────────────────────────────────────────────
-    recommendations = _build_recommendations(
-        avg_resume_score, accuracy_pct, total_sessions,
-        [s for s, _ in top_missing], user_skills_set
+    # ── 5. Generate Recommendations & Return ──────────────────────────────
+    user_skills_set = {sk.lower() for sk in matched_skill_counts.keys()}
+    
+    recs = _build_recommendations(
+        avg_resume=avg_resume_score,
+        coding_acc=accuracy_pct,
+        interview_sessions=total_sessions,
+        missing_skills=[sk for sk, _ in top_missing],
+        user_skills=user_skills_set
     )
 
     return {
-        "readiness_score": readiness_score,
         "resume": {
-            "avg_score":    avg_resume_score,
-            "total_scans":  len(resume_docs),
-            "trend":        resume_trend,
-            "top_missing":  [{"skill": s, "count": c} for s, c in top_missing],
-            "top_matched":  [{"skill": s, "count": c} for s, c in top_matched],
-            "last_suggestions": resume_docs[-1]["suggestions"] if resume_docs else "",
+            "avg_score": avg_resume_score,
+            "trend": resume_trend,
+            "top_missing": top_missing,
+            "top_matched": top_matched
         },
         "coding": {
             "total_attempts": total_attempts,
-            "total_solved":   total_solved,
-            "accuracy_pct":   accuracy_pct,
-            "lang_chart":     lang_chart,
-            "diff_chart":     diff_chart,
+            "total_solved": total_solved,
+            "accuracy_pct": accuracy_pct,
+            "lang_chart": lang_chart,
+            "diff_chart": diff_chart
         },
-        "interview": {
-            "total_sessions":  total_sessions,
-            "roles_practiced": roles_practiced,
-            "feedback_count":  len(feedback_msgs),
-            "recent_feedback": feedback_msgs[-3:],
+        "interviews": {
+            "total_sessions": total_sessions,
+            "roles_practiced": roles_practiced
         },
         "jobs": {
-            "total_saved":   total_jobs_saved,
-            "source_counts": [{"name": k, "value": v} for k, v in source_counts.items()],
-            "recent":        recent_jobs,
+            "total_saved": total_jobs_saved,
+            "source_counts": source_counts,
+            "recent": recent_jobs
         },
-        "skill_gap":       skill_gap,
-        "recommendations": recommendations,
+        "recommendations": recs
     }
-
-
-def _build_recommendations(
-    avg_resume: int,
-    coding_acc: int,
-    interview_sessions: int,
-    missing_skills: list[str],
-    user_skills: set[str],
-) -> list[dict]:
-    """Generate actionable recommendations based on user data."""
-    recs = []
-
-    if avg_resume < 60:
-        recs.append({
-            "area": "Resume",
-            "priority": "high",
-            "action": "Your resume match score is below 60%. Upload your resume against more job descriptions and add the missing skills highlighted in the gap analysis.",
-        })
-    elif avg_resume < 80:
-        recs.append({
-            "area": "Resume",
-            "priority": "medium",
-            "action": f"Resume score is {avg_resume}%. Focus on adding: {', '.join(missing_skills[:4]) or 'the skills shown in the gap analysis'}.",
-        })
-
-    if coding_acc < 50:
-        recs.append({
-            "area": "Coding",
-            "priority": "high",
-            "action": "Coding accuracy is below 50%. Practice Easy problems daily to build confidence before attempting Medium difficulty.",
-        })
-    elif coding_acc < 75:
-        recs.append({
-            "area": "Coding",
-            "priority": "medium",
-            "action": "Good coding progress! Push to Medium and Hard problems to stand out in technical interviews.",
-        })
-
-    if interview_sessions < 3:
-        recs.append({
-            "area": "Interview",
-            "priority": "high",
-            "action": "You've done fewer than 3 mock interview sessions. Practice daily — consistency is the fastest way to improve communication and confidence.",
-        })
-
-    # High-demand skills the user doesn't have
-    high_demand_missing = [
-        ms["skill"] for ms in MARKET_SKILLS
-        if ms["demand"] >= 80 and ms["skill"].lower() not in user_skills
-    ][:4]
-    if high_demand_missing:
-        recs.append({
-            "area": "Skills",
-            "priority": "high",
-            "action": f"High-demand skills you're missing: {', '.join(high_demand_missing)}. Adding even one of these significantly improves your market value.",
-        })
-
-    if not recs:
-        recs.append({
-            "area": "General",
-            "priority": "low",
-            "action": "Great progress! Keep practicing coding, run more resume scans against real job descriptions, and do mock interviews weekly.",
-        })
-
-    return recs
-
 
 # ---------------------------------------------------------------------------
 # Market skills endpoint (public — no auth needed for the chart)
