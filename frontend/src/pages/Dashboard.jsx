@@ -3,19 +3,15 @@ import { useNavigate } from "react-router-dom";
 import "../page_style/dashboard.css";
 import Navbar from "../components/Navbar";
 
+// Helper function to capitalize placeholders
+const formatLabel = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
 export default function Dashboard() {
   const navigate = useNavigate();
 
   const defaultData = {
     personal: {
-      name: "",
-      title: "",
-      email: "",
-      phone: "",
-      address: "",
-      github: "",
-      linkedin: "",
-      summary: "",
+      name: "", title: "", email: "", phone: "", address: "", github: "", linkedin: "", summary: "",
     },
     skills: [""],
     experience: [{ role: "", company: "", duration: "", description: "" }],
@@ -29,10 +25,10 @@ export default function Dashboard() {
 
   const [data, setData] = useState(defaultData);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const token = localStorage.getItem("token");
 
-  // ✅ Load resume from backend
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -42,14 +38,9 @@ export default function Dashboard() {
     const fetchResume = async () => {
       try {
         const res = await fetch("http://localhost:8000/api/resumes", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         const result = await res.json();
-
-        // 👉 If user already has resume, load latest
         if (result.length > 0) {
           setData(result[0].data);
         }
@@ -66,10 +57,7 @@ export default function Dashboard() {
   // 🟢 Handlers
   const handlePersonalChange = (e) => {
     const { name, value } = e.target;
-    setData((prev) => ({
-      ...prev,
-      personal: { ...prev.personal, [name]: value },
-    }));
+    setData((prev) => ({ ...prev, personal: { ...prev.personal, [name]: value } }));
   };
 
   const handleArrayChange = (section, index, value) => {
@@ -87,23 +75,23 @@ export default function Dashboard() {
   const addField = (section, type = "string") => {
     if (type === "object") {
       let emptyObject = {};
-      Object.keys(data[section][0]).forEach((key) => (emptyObject[key] = ""));
-      setData({
-        ...data,
-        [section]: [...data[section], emptyObject],
-      });
+      Object.keys(data[section][0] || defaultData[section][0]).forEach((key) => (emptyObject[key] = ""));
+      setData({ ...data, [section]: [...data[section], emptyObject] });
     } else {
-      setData({
-        ...data,
-        [section]: [...data[section], ""],
-      });
+      setData({ ...data, [section]: [...data[section], ""] });
     }
   };
 
-  // ✅ Save to backend (NOT localStorage)
+  // ✅ New: Remove Field Handler
+  const removeField = (section, index) => {
+    const updated = [...data[section]];
+    updated.splice(index, 1);
+    setData({ ...data, [section]: updated });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setSaving(true);
     try {
       await fetch("http://localhost:8000/api/resumes", {
         method: "POST",
@@ -112,24 +100,28 @@ export default function Dashboard() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          templateId: "Template1", // later dynamic
+          templateId: "Template1", 
           data: data,
         }),
       });
-
       navigate("/templates");
     } catch (err) {
       console.error("Error saving resume:", err);
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (loading) return <h2>Loading...</h2>;
+  if (loading) return <div className="loading-screen"><div className="spinner"></div>Loading Dashboard...</div>;
 
   return (
-    <>
+    <div className="dashboard-page">
       <Navbar />
       <div className="dashboard-container">
-        <h1 className="dashboard-title">Resume Builder Dashboard</h1>
+        <div className="dashboard-header">
+          <h1 className="dashboard-title">Resume Builder</h1>
+          <p>Fill in your details below. The AI will help optimize your resume later.</p>
+        </div>
 
         <form onSubmit={handleSubmit} className="dashboard-form">
 
@@ -138,14 +130,26 @@ export default function Dashboard() {
             <h2>Personal Information</h2>
             <div className="form-grid">
               {Object.keys(data.personal).map((key) => (
-                <input
-                  key={key}
-                  type="text"
-                  name={key}
-                  placeholder={key}
-                  value={data.personal[key]}
-                  onChange={handlePersonalChange}
-                />
+                <div key={key} className={key === "summary" ? "full-width" : ""}>
+                  <label>{formatLabel(key)}</label>
+                  {key === "summary" ? (
+                    <textarea
+                      name={key}
+                      placeholder={`Enter your professional ${key}...`}
+                      value={data.personal[key]}
+                      onChange={handlePersonalChange}
+                      rows="4"
+                    />
+                  ) : (
+                    <input
+                      type={key === "email" ? "email" : "text"}
+                      name={key}
+                      placeholder={`e.g. ${formatLabel(key)}`}
+                      value={data.personal[key]}
+                      onChange={handlePersonalChange}
+                    />
+                  )}
+                </div>
               ))}
             </div>
           </section>
@@ -153,110 +157,88 @@ export default function Dashboard() {
           {/* SKILLS */}
           <section className="form-section">
             <h2>Skills</h2>
-            {data.skills.map((skill, i) => (
-              <input
-                key={i}
-                value={skill}
-                onChange={(e) =>
-                  handleArrayChange("skills", i, e.target.value)
-                }
-              />
-            ))}
-            <button type="button" onClick={() => addField("skills")}>
-              + Add Skill
-            </button>
-          </section>
-
-          {/* EXPERIENCE */}
-          <section className="form-section">
-            <h2>Experience</h2>
-            {data.experience.map((exp, i) => (
-              <div key={i}>
-                {Object.keys(exp).map((key) => (
+            <div className="dynamic-list">
+              {data.skills.map((skill, i) => (
+                <div key={i} className="dynamic-input-row">
                   <input
-                    key={key}
-                    value={exp[key]}
-                    placeholder={key}
-                    onChange={(e) =>
-                      handleObjectArrayChange("experience", i, key, e.target.value)
-                    }
+                    placeholder="e.g. JavaScript, React, Python"
+                    value={skill}
+                    onChange={(e) => handleArrayChange("skills", i, e.target.value)}
                   />
-                ))}
-              </div>
-            ))}
-            <button type="button" onClick={() => addField("experience", "object")}>
-              + Add Experience
-            </button>
+                  <button type="button" className="remove-btn" onClick={() => removeField("skills", i)}>✕</button>
+                </div>
+              ))}
+            </div>
+            <button type="button" className="add-btn" onClick={() => addField("skills")}>+ Add Skill</button>
           </section>
 
-          {/* EDUCATION */}
-          <section className="form-section">
-            <h2>Education</h2>
-            {data.education.map((edu, i) => (
-              <div key={i}>
-                {Object.keys(edu).map((key) => (
-                  <input
-                    key={key}
-                    value={edu[key]}
-                    placeholder={key}
-                    onChange={(e) =>
-                      handleObjectArrayChange("education", i, key, e.target.value)
-                    }
-                  />
-                ))}
-              </div>
-            ))}
-            <button type="button" onClick={() => addField("education", "object")}>
-              + Add Education
-            </button>
-          </section>
+          {/* EXPERIENCE, EDUCATION, PROJECTS */}
+          {["experience", "education", "projects"].map((section) => (
+            <section key={section} className="form-section">
+              <h2>{formatLabel(section)}</h2>
+              {data[section].map((item, i) => (
+                <div key={i} className="nested-card">
+                  <div className="card-header">
+                    <span>Entry #{i + 1}</span>
+                    <button type="button" className="remove-btn text-remove" onClick={() => removeField(section, i)}>Remove</button>
+                  </div>
+                  <div className="form-grid">
+                    {Object.keys(item).map((key) => (
+                      <div key={key} className={key === "description" ? "full-width" : ""}>
+                        <label>{formatLabel(key)}</label>
+                        {key === "description" ? (
+                          <textarea
+                            placeholder={`Describe your ${key}...`}
+                            value={item[key]}
+                            onChange={(e) => handleObjectArrayChange(section, i, key, e.target.value)}
+                            rows="3"
+                          />
+                        ) : (
+                          <input
+                            placeholder={`e.g. ${formatLabel(key)}`}
+                            value={item[key]}
+                            onChange={(e) => handleObjectArrayChange(section, i, key, e.target.value)}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <button type="button" className="add-btn" onClick={() => addField(section, "object")}>
+                + Add {formatLabel(section)}
+              </button>
+            </section>
+          ))}
 
-          {/* PROJECTS */}
-          <section className="form-section">
-            <h2>Projects</h2>
-            {data.projects.map((proj, i) => (
-              <div key={i}>
-                {Object.keys(proj).map((key) => (
-                  <input
-                    key={key}
-                    value={proj[key]}
-                    placeholder={key}
-                    onChange={(e) =>
-                      handleObjectArrayChange("projects", i, key, e.target.value)
-                    }
-                  />
-                ))}
-              </div>
-            ))}
-            <button type="button" onClick={() => addField("projects", "object")}>
-              + Add Project
-            </button>
-          </section>
-
-          {/* OTHER */}
-          {["certifications", "achievements", "activities", "languages"].map(
-            (section) => (
-              <section key={section}>
-                <h2>{section}</h2>
+          {/* OTHER SIMPLE ARRAYS */}
+          {["certifications", "achievements", "activities", "languages"].map((section) => (
+            <section key={section} className="form-section half-section">
+              <h2>{formatLabel(section)}</h2>
+              <div className="dynamic-list">
                 {data[section].map((item, i) => (
-                  <input
-                    key={i}
-                    value={item}
-                    onChange={(e) =>
-                      handleArrayChange(section, i, e.target.value)
-                    }
-                  />
+                  <div key={i} className="dynamic-input-row">
+                    <input
+                      placeholder={`e.g. ${formatLabel(section)} details`}
+                      value={item}
+                      onChange={(e) => handleArrayChange(section, i, e.target.value)}
+                    />
+                    <button type="button" className="remove-btn" onClick={() => removeField(section, i)}>✕</button>
+                  </div>
                 ))}
-                <button type="button" onClick={() => addField(section)}>
-                  + Add
-                </button>
-              </section>
-            )
-          )}
+              </div>
+              <button type="button" className="add-btn" onClick={() => addField(section)}>+ Add</button>
+            </section>
+          ))}
 
-          <button type="submit">Save & Continue</button>
+          <div className="form-actions">
+            <button type="submit" className="submit-btn" disabled={saving}>
+              {saving ? "Saving..." : "Save & Continue to Templates"}
+            </button>
+          </div>
+
         </form>
       </div>
-    </>
+    </div>
   );
 }

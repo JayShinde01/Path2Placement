@@ -658,7 +658,7 @@ export default function Reports() {
 
         </motion.div>
 
-        <footer className="reports-footer">PlacementAI © 2026</footer>
+        <footer className="reports-footer">Path2Placement © 2026</footer>
       </div>
     </div>
   );

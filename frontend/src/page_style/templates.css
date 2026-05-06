@@ -276,6 +276,66 @@
   .tpl-btn-preview, .tpl-btn-use { font-size: 9px; padding: 5px 0; }
   .tpl-tag { font-size: 7px; padding: 1px 6px; }
 }
+
+/* ── Theme Overrides ─────────────────────────────────────────────────── */
+:root[data-theme="light"] .templates-page {
+  background: linear-gradient(180deg, #f8fbff 0%, #eef2ff 100%);
+}
+
+:root[data-theme="light"] .templates-hero-title {
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .templates-hero-sub {
+  color: #64748b;
+}
+
+:root[data-theme="light"] .templates-loading {
+  color: #64748b;
+}
+
+:root[data-theme="light"] .tpl-spinner {
+  border-color: #cbd5e1;
+  border-top-color: #2563eb;
+}
+
+:root[data-theme="light"] .template-card-new {
+  background: #ffffff;
+  border-color: #dbeafe;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+}
+
+:root[data-theme="light"] .template-card-new:hover {
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+}
+
+:root[data-theme="light"] .tpl-name {
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .tpl-desc {
+  color: #64748b;
+}
+
+:root[data-theme="light"] .tpl-btn-preview {
+  color: #334155;
+  border-color: #cbd5e1;
+  background: #ffffff;
+}
+
+:root[data-theme="light"] .tpl-btn-preview:hover {
+  background: #eff6ff;
+  color: #0f172a;
+  border-color: #93c5fd;
+}
+
+:root[data-theme="light"] .tpl-mock {
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
+}
+
+:root[data-theme="dark"] .templates-page {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
 @media (max-width: 768px) {
   .templates-hero-title { font-size: 1.8rem; }
   .templates-grid-new { grid-template-columns: 1fr 1fr; gap: 18px; padding: 0 16px; }

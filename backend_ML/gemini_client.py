@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from dataclasses import dataclass
 from typing import Iterable, List, Optional
 
@@ -11,6 +12,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 GOOGLE_GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
+_TASK_COOLDOWNS: dict[str, float] = {}
 
 
 @dataclass(frozen=True)
@@ -21,19 +23,19 @@ class GeminiTaskConfig:
 
 GEMINI_TASKS = {
     "assistant_chat": GeminiTaskConfig(
-        models=["gemini-2.5-flash", "gemini-1.5-flash"],
+        models=["gemini-2.5-flash"],
         max_output_tokens=256,
     ),
     "assistant_insights": GeminiTaskConfig(
-        models=["gemini-2.5-flash", "gemini-1.5-flash"],
+        models=["gemini-2.5-flash"],
         max_output_tokens=220,
     ),
     "interview_feedback": GeminiTaskConfig(
-        models=["gemini-2.5-flash", "gemini-1.5-flash"],
+        models=["gemini-2.5-flash"],
         max_output_tokens=160,
     ),
     "interview_final_feedback": GeminiTaskConfig(
-        models=["gemini-2.5-flash", "gemini-1.5-flash"],
+        models=["gemini-2.5-flash"],
         max_output_tokens=220,
     ),
 }
@@ -57,6 +59,11 @@ def generate_gemini_text(prompt: str, *, task: str) -> str:
     if not GOOGLE_GEMINI_API_KEY:
         return ""
 
+    cooldown_until = _TASK_COOLDOWNS.get(task, 0.0)
+    if cooldown_until and time.time() < cooldown_until:
+        logger.warning("Gemini task '%s' is on cooldown; returning local fallback.", task)
+        return ""
+
     config = _task_config(task)
     model_names = _unique_models(config.models)
 
@@ -75,6 +82,10 @@ def generate_gemini_text(prompt: str, *, task: str) -> str:
         except Exception as exc:
             last_error = exc
             logger.warning("Gemini task '%s' failed on model '%s': %s", task, model_name, exc)
+            message = str(exc).lower()
+            if "quota" in message or "429" in message or "rate limit" in message:
+                _TASK_COOLDOWNS[task] = time.time() + 60
+                break
 
     if last_error:
         logger.error("All Gemini models failed for task '%s': %s", task, last_error)

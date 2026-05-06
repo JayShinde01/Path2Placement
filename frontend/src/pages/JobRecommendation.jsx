@@ -16,13 +16,11 @@ export default function JobRecommendation() {
   const [apiLocation, setApiLocation] = useState("");
 
   const token = localStorage.getItem("token");
+  const skillsKey = skills.filter(Boolean).join(",");
+  const cacheKey = `jobs_v2_${query}_${apiLocation}_${skillsKey}`;
 
   // ⏱ Cache duration (10 min)
   const CACHE_DURATION = 1000 * 60 * 10;
-
-  // 🔑 Unique cache key
-  const getCacheKey = () =>
-    `jobs_${query}_${apiLocation}_${skills.join(",")}`;
 
   // ================================
   // 🔥 Load resume (skills + location)
@@ -94,15 +92,14 @@ export default function JobRecommendation() {
   // 🔥 Instant cache load
   // ================================
   useEffect(() => {
-    const key = getCacheKey();
-    const cached = localStorage.getItem(key);
+    const cached = localStorage.getItem(cacheKey);
 
     if (cached) {
       console.log("⚡ Instant cache load");
       setJobs(JSON.parse(cached));
       setLoading(false);
     }
-  }, []);
+  }, [cacheKey]);
 
   // ================================
   // 🔥 Fetch jobs (smart cache)
@@ -112,9 +109,8 @@ export default function JobRecommendation() {
     setError(null);
 
     try {
-      const key = getCacheKey();
-      const cached = localStorage.getItem(key);
-      const cachedTime = localStorage.getItem(key + "_time");
+      const cached = localStorage.getItem(cacheKey);
+      const cachedTime = localStorage.getItem(cacheKey + "_time");
 
       // ✅ Use cache if valid
       if (cached && cachedTime) {
@@ -140,7 +136,7 @@ export default function JobRecommendation() {
         body: JSON.stringify({
           query,
           location: apiLocation || "India",
-          skills,
+          skills: skills.filter(Boolean),
         }),
       });
 
@@ -152,8 +148,8 @@ export default function JobRecommendation() {
       setJobs(results);
 
       // ✅ Save cache
-      localStorage.setItem(key, JSON.stringify(results));
-      localStorage.setItem(key + "_time", Date.now().toString());
+      localStorage.setItem(cacheKey, JSON.stringify(results));
+      localStorage.setItem(cacheKey + "_time", Date.now().toString());
 
     } catch (err) {
       console.error(err);
@@ -170,7 +166,7 @@ export default function JobRecommendation() {
   useEffect(() => {
     const t = setTimeout(fetchJobs, 600);
     return () => clearTimeout(t);
-  }, [query, apiLocation, skills]);
+  }, [cacheKey]);
 
   // ================================
   // 🔥 Apply job
@@ -270,7 +266,7 @@ export default function JobRecommendation() {
                     <div className="job-card-badges">
                       <span className="badge badge-source">{job.source}</span>
 
-                      {job.match && (
+                      {job.match !== undefined && job.match !== null && (
                         <span className="badge badge-match">
                           🔥 {job.match}% Match
                         </span>

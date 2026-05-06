@@ -1,161 +1,426 @@
-/* ===== Dashboard Container ===== */
+/* ===== DASHBOARD VARIABLES ===== */
+.dashboard-page {
+  --bg-page: #f4f7f6;
+  --bg-card: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --primary: #2563eb;       /* Matches Navy Theme */
+  --primary-hover: #1d4ed8;
+  --border: #e2e8f0;
+  --danger: #ef4444;
+  --danger-hover: #fee2e2;
+  
+  background-color: var(--bg-page);
+  min-height: 100vh;
+  padding-bottom: 50px;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--text-main);
+}
+
+/* ===== LAYOUT & HEADER ===== */
 .dashboard-container {
-  max-width: 900px;
-  margin: 40px auto;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
-  padding: 30px 40px;
-  font-family: "Poppins", sans-serif;
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
-/* ===== Title ===== */
-.dashboard-title {
+.dashboard-header {
   text-align: center;
-  color: #2c3e50;
-  font-size: 28px;
-  margin-bottom: 25px;
+  margin-bottom: 40px;
 }
 
-/* ===== Form Structure ===== */
+.dashboard-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #0a192f; /* Deep Navy */
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-page .dashboard-header p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* ===== FORM SECTIONS (CARDS) ===== */
 .dashboard-form {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 30px;
 }
 
-/* ===== Section Headings ===== */
-.form-section h2 {
-  color: #34495e;
-  font-size: 20px;
-  margin-bottom: 10px;
+.form-section {
+  background: var(--bg-card);
+  padding: 35px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border);
 }
 
-/* ===== Input Grid ===== */
+.dashboard-page .form-section h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0a192f;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--bg-page);
+}
+
+/* ===== INPUTS & GRIDS ===== */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
 
-/* ===== Inputs ===== */
-input {
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.dashboard-page label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.dashboard-page input,
+.dashboard-page textarea {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 15px;
-  transition: 0.2s;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #f8fafc;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
 }
 
-input:focus {
-  border-color: #3498db;
+.dashboard-page textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.dashboard-page input:focus,
+.dashboard-page textarea:focus {
+  border-color: var(--primary);
+  background: #ffffff;
   outline: none;
-  box-shadow: 0 0 3px rgba(52,152,219,0.4);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-/* ===== Nested Cards ===== */
+.dashboard-page input::placeholder,
+.dashboard-page textarea::placeholder {
+  color: #a1a1aa;
+}
+
+/* ===== DYNAMIC LISTS & NESTED CARDS ===== */
+.dynamic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.dynamic-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .nested-card {
-  background: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 10px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
 }
 
-/* ===== Add Button ===== */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ===== BUTTONS ===== */
 .add-btn {
-  background: none;
-  border: none;
-  color: #007bff;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+  border: 1px dashed var(--primary);
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
-  margin-top: 5px;
-  transition: color 0.3s ease;
+  transition: all 0.2s ease;
+  width: 100%;
+  display: block;
+  text-align: center;
 }
 
 .add-btn:hover {
-  text-decoration: underline;
-  color: #0056b3;
+  background: var(--primary);
+  color: white;
 }
 
-/* ===== Submit Button ===== */
-.submit-btn {
-  background-color: #007bff;
+.remove-btn {
+  background: #f1f5f9;
+  border: none;
+  color: var(--text-muted);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.remove-btn:hover {
+  background: var(--danger-hover);
+  color: var(--danger);
+}
+
+.text-remove {
+  width: auto;
+  height: auto;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  background: transparent;
+}
+
+/* SUBMIT BUTTON */
+.form-actions {
+  margin-top: 20px;
+}
+
+.dashboard-page .submit-btn {
+  background: linear-gradient(135deg, var(--primary), #0ea5e9);
   color: white;
   border: none;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 16px;
+  padding: 16px 30px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
+  width: 100%;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
 }
 
-.submit-btn:hover {
-  background-color: #0056b3;
-  transform: translateY(-1px);
+.dashboard-page .submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
 }
 
-/* ===== Responsive Design ===== */
-
-/* Medium Screens (Tablets) */
-@media (max-width: 992px) {
-  .dashboard-container {
-    padding: 25px 30px;
-    margin: 30px 20px;
-  }
-
-  .dashboard-title {
-    font-size: 24px;
-  }
-
-  .form-section h2 {
-    font-size: 18px;
-  }
+.dashboard-page .submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
-/* Small Screens (Mobile ≤ 768px) */
+/* ===== LOADING SCREEN ===== */
+.loading-screen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(37, 99, 235, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .dashboard-container {
-    padding: 25px 20px;
-  }
-
-  .dashboard-title {
-    font-size: 22px;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  input {
-    font-size: 14px;
-    padding: 9px 10px;
-  }
-
-  .submit-btn {
-    font-size: 15px;
-    padding: 10px;
-  }
+  .dashboard-container { padding: 20px 15px; }
+  .form-section { padding: 25px 20px; }
+  .nested-card { padding: 20px 15px; }
+  .dashboard-title { font-size: 1.8rem; }
+  .form-grid { grid-template-columns: 1fr; }
 }
 
-/* Extra Small Screens (≤ 480px) */
-@media (max-width: 480px) {
-  .dashboard-container {
-    margin: 20px 10px;
-    padding: 20px 15px;
-  }
+/* ===== DARK THEME OVERRIDES ===== */
+:root[data-theme="dark"] .dashboard-page {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --primary: #38bdf8;
+  --primary-hover: #0ea5e9;
+  --border: #334155;
+  --danger: #f87171;
+  --danger-hover: rgba(239, 68, 68, 0.16);
+  background: radial-gradient(circle at top, #111827 0%, #0f172a 45%, #020617 100%);
+  color: var(--text-main);
+}
 
-  .dashboard-title {
-    font-size: 20px;
-  }
+:root[data-theme="dark"] .dashboard-title,
+:root[data-theme="dark"] .dashboard-page .form-section h2 {
+  color: #f8fafc;
+}
 
-  .form-section h2 {
-    font-size: 16px;
-  }
+:root[data-theme="dark"] .dashboard-page .dashboard-header p,
+:root[data-theme="dark"] .dashboard-page label,
+:root[data-theme="dark"] .card-header,
+:root[data-theme="dark"] .loading-screen {
+  color: var(--text-muted);
+}
 
-  .submit-btn {
-    width: 100%;
-  }
+:root[data-theme="dark"] .form-section,
+:root[data-theme="dark"] .nested-card {
+  background: rgba(15, 23, 42, 0.92);
+  border-color: var(--border);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+:root[data-theme="dark"] .dashboard-page input,
+:root[data-theme="dark"] .dashboard-page textarea {
+  background: #0b1220;
+  color: var(--text-main);
+  border-color: var(--border);
+}
+
+:root[data-theme="dark"] .dashboard-page input::placeholder,
+:root[data-theme="dark"] .dashboard-page textarea::placeholder {
+  color: #64748b;
+}
+
+:root[data-theme="dark"] .dashboard-page input:focus,
+:root[data-theme="dark"] .dashboard-page textarea:focus {
+  background: #0f172a;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+}
+
+:root[data-theme="dark"] .dashboard-page .form-section h2 {
+  border-bottom-color: #1f2937;
+}
+
+:root[data-theme="dark"] .add-btn {
+  background: rgba(56, 189, 248, 0.08);
+  color: #7dd3fc;
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+:root[data-theme="dark"] .add-btn:hover {
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: #08101f;
+}
+
+:root[data-theme="dark"] .remove-btn {
+  background: #111827;
+  color: #cbd5e1;
+}
+
+:root[data-theme="dark"] .remove-btn:hover {
+  background: rgba(248, 113, 113, 0.18);
+  color: #fecaca;
+}
+
+:root[data-theme="dark"] .text-remove {
+  background: transparent;
+}
+
+:root[data-theme="dark"] .dashboard-page .submit-btn {
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+}
+
+:root[data-theme="dark"] .dashboard-page .submit-btn:hover:not(:disabled) {
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.45);
+}
+
+:root[data-theme="dark"] .spinner {
+  border-color: rgba(56, 189, 248, 0.18);
+  border-top-color: var(--primary);
+}
+
+:root[data-theme="dark"] .dashboard-page .submit-btn:disabled {
+  opacity: 0.6;
+}
+
+/* ===== LIGHT THEME OVERRIDES ===== */
+:root[data-theme="light"] .dashboard-page {
+  --bg-page: #f4f7ff;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --border: #dbeafe;
+  --danger: #dc2626;
+  --danger-hover: #fee2e2;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef2ff 100%);
+  color: var(--text-main);
+}
+
+:root[data-theme="light"] .dashboard-title,
+:root[data-theme="light"] .dashboard-page .form-section h2 {
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .dashboard-page input,
+:root[data-theme="light"] .dashboard-page textarea,
+:root[data-theme="light"] .nested-card,
+:root[data-theme="light"] .form-section {
+  background: #ffffff;
+}
+
+:root[data-theme="light"] .dashboard-page input::placeholder,
+:root[data-theme="light"] .dashboard-page textarea::placeholder {
+  color: #94a3b8;
+}
+
+:root[data-theme="light"] .dashboard-page input:focus,
+:root[data-theme="light"] .dashboard-page textarea:focus {
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+:root[data-theme="light"] .add-btn {
+  background: rgba(37, 99, 235, 0.06);
+}
+
+:root[data-theme="light"] .remove-btn {
+  background: #eef2ff;
+  color: #475569;
+}
+
+:root[data-theme="light"] .remove-btn:hover {
+  background: #fee2e2;
+}
+
+:root[data-theme="light"] .loading-screen {
+  color: #2563eb;
+}
+
+:root[data-theme="light"] .spinner {
+  border-color: rgba(37, 99, 235, 0.18);
+  border-top-color: #2563eb;
 }

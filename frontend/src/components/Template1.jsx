@@ -10,13 +10,20 @@ export default function Template1() {
   const [editData, setEditData] = useState(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("resumeData");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      setData(parsed);
-      setEditData(JSON.parse(stored));
+    // First check if data was passed via navigation (location.state)
+    if (location.state?.data) {
+      setData(location.state.data);
+      setEditData(location.state.data);
+    } else {
+      // Fallback to localStorage
+      const stored = localStorage.getItem("resumeData");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setData(parsed);
+        setEditData(JSON.parse(stored));
+      }
     }
-  }, []);
+  }, [location.state?.data]);
 
   const handleDownload = () => {
     const printContents = printRef.current.innerHTML;

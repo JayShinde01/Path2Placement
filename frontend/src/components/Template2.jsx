@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Template2() {
+  const location = useLocation();
   const navigate = useNavigate();
   const printRef = useRef();
   const [data, setData] = useState(null);
@@ -9,13 +10,20 @@ export default function Template2() {
   const [editData, setEditData] = useState(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("resumeData");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      setData(parsed);
-      setEditData(JSON.parse(stored));
+    // First check if data was passed via navigation (location.state)
+    if (location.state?.data) {
+      setData(location.state.data);
+      setEditData(location.state.data);
+    } else {
+      // Fallback to localStorage
+      const stored = localStorage.getItem("resumeData");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setData(parsed);
+        setEditData(JSON.parse(stored));
+      }
     }
-  }, []);
+  }, [location.state?.data]);
 
   const handleDownload = () => {
     const win = window.open("", "_blank");

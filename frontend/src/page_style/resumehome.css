@@ -1,16 +1,16 @@
 /* 🌟 Modern Glassmorphic UI — AI Resume Builder */
 .modern-home {
   font-family: "Poppins", sans-serif;
-  background: linear-gradient(180deg, #f4f7ff 0%, #eef1f9 100%);
-  color: #1e1e2f;
+  background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
+  color: #e2e8f0;
   min-height: 100vh;
   padding-bottom: 100px;
   overflow-x: hidden;
 }
 
 /* 🦾 Hero Section */
-.hero-section {
-  background: linear-gradient(135deg, #0047ab, #4a6cf7, #73a6ff);
+.modern-home .hero-section {
+  background: linear-gradient(135deg, #0f172a, #1e3a8a, #1d4ed8);
   color: #fff;
   text-align: center;
   padding: 110px 25px 130px;
@@ -19,22 +19,22 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
-.hero-title {
+.modern-home .hero-title {
   font-size: 3.2rem;
   font-weight: 700;
   letter-spacing: 1px;
   margin-bottom: 15px;
 }
 
-.hero-subtitle {
+.modern-home .hero-subtitle {
   font-size: 1.1rem;
   max-width: 750px;
   margin: 0 auto 30px;
-  opacity: 0.95;
+  color: #bfdbfe;
   line-height: 1.6;
 }
 
-.button-group {
+.modern-home .button-group {
   display: flex;
   justify-content: center;
   gap: 20px;
@@ -43,7 +43,7 @@
 }
 
 /* 🎯 Buttons */
-.btn {
+.modern-home .btn {
   border: none;
   padding: 14px 32px;
   border-radius: 30px;
@@ -54,30 +54,31 @@
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.1);
 }
 
-.primary-btn {
-  background-color: #ffffff;
-  color: #0047ab;
+.modern-home .primary-btn {
+  background-color: #2563eb;
+  color: #ffffff;
 }
-.primary-btn:hover {
-  background-color: #e8efff;
+.modern-home .primary-btn:hover {
+  background-color: #1d4ed8;
   transform: translateY(-3px);
 }
 
-.secondary-btn {
-  background-color: #1e1e2f;
-  color: #fff;
+.modern-home .secondary-btn {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
 }
-.secondary-btn:hover {
-  background-color: #34364a;
+.modern-home .secondary-btn:hover {
+  background-color: #1e293b;
   transform: translateY(-3px);
 }
 
-.success-btn {
-  background-color: #2ecc71;
+.modern-home .success-btn {
+  background-color: #0ea5e9;
   color: #fff;
 }
-.success-btn:hover {
-  background-color: #28b463;
+.modern-home .success-btn:hover {
+  background-color: #0284c7;
   transform: translateY(-3px);
 }
 
@@ -89,115 +90,117 @@
 }
 
 /* 🧠 Section Titles */
-.section-title {
+.modern-home .section-title {
   text-align: center;
   font-weight: 700;
   font-size: 1.8rem;
-  color: #2c3e50;
+  color: #e2e8f0;
   margin-bottom: 8px;
 }
 
-.section-desc {
+.modern-home .section-desc {
   text-align: center;
-  color: #555;
+  color: #cbd5e1;
   margin-bottom: 40px;
   font-size: 1rem;
 }
 
 /* 📤 Upload Card (Glassmorphism) */
-.upload-card {
-  background: rgba(255, 255, 255, 0.8);
+.modern-home .upload-card {
+  background: rgba(17, 24, 39, 0.92);
+  border: 1px solid #1f2937;
   border-radius: 18px;
   padding: 30px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
   transition: all 0.3s ease;
 }
-.upload-card:hover {
+.modern-home .upload-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
 }
 
 /* 📁 Upload Area */
-.upload-group {
+.modern-home .upload-group {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-.upload-label {
-  background: #eef3ff;
-  border: 2px dashed #6c8bff;
+.modern-home .upload-label {
+  background: #0f172a;
+  border: 2px dashed #2563eb;
   padding: 14px;
   border-radius: 12px;
   text-align: center;
   font-weight: 500;
-  color: #3654ff;
+  color: #93c5fd;
   cursor: pointer;
   transition: 0.25s;
 }
-.upload-label:hover {
-  background: #e2e9ff;
+.modern-home .upload-label:hover {
+  background: #1e293b;
 }
-.upload-label input {
+.modern-home .upload-label input {
   display: none;
 }
 
-.file-name {
+.modern-home .file-name {
   font-size: 0.95rem;
-  color: #333;
+  color: #cbd5e1;
   text-align: center;
 }
 
 /* ✅ Checkbox */
-.checkbox-label {
+.modern-home .checkbox-label {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-top: 5px;
   cursor: pointer;
-  color: #333;
+  color: #cbd5e1;
 }
 
 /* 📝 Textarea */
-textarea {
-  border: 1px solid #dcdcdc;
+.modern-home textarea {
+  border: 1px solid #334155;
   border-radius: 10px;
   padding: 12px;
   resize: vertical;
   font-family: inherit;
   font-size: 1rem;
   line-height: 1.5;
-  background: #fff;
+  background: #0f172a;
+  color: #e2e8f0;
   width: 100%;
 }
 
 /* 🧾 Results Section */
-.result-section {
+.modern-home .result-section {
   margin-top: 35px;
-  background: #f9fbff;
+  background: #0f172a;
   border-radius: 16px;
   padding: 25px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-  border-left: 6px solid #4a6cf7;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  border-left: 6px solid #2563eb;
 }
-.score-high {
+.modern-home .score-high {
   color: #27ae60;
   font-weight: 700;
 }
-.score-medium {
+.modern-home .score-medium {
   color: #f1c40f;
   font-weight: 700;
 }
-.score-low {
+.modern-home .score-low {
   color: #e74c3c;
   font-weight: 700;
 }
 
-.resume-style {
+.modern-home .resume-style {
   margin: 20px 0;
 }
-.download-section {
+.modern-home .download-section {
   text-align: center;
   margin-top: 20px;
 }
@@ -206,11 +209,11 @@ textarea {
 
 /* Medium devices (tablets ≤1024px) */
 @media (max-width: 1024px) {
-  .hero-title {
+  .modern-home .hero-title {
     font-size: 2.6rem;
   }
 
-  .hero-subtitle {
+  .modern-home .hero-subtitle {
     font-size: 1rem;
     max-width: 600px;
   }
@@ -222,38 +225,38 @@ textarea {
 
 /* Small devices (phones ≤768px) */
 @media (max-width: 768px) {
-  .hero-section {
+  .modern-home .hero-section {
     padding: 80px 20px 100px;
     border-radius: 0;
   }
 
-  .hero-title {
+  .modern-home .hero-title {
     font-size: 2.2rem;
   }
 
-  .hero-subtitle {
+  .modern-home .hero-subtitle {
     font-size: 0.95rem;
   }
 
-  .button-group {
+  .modern-home .button-group {
     flex-direction: column;
     align-items: center;
     gap: 15px;
   }
 
-  .upload-card {
+  .modern-home .upload-card {
     padding: 22px;
   }
 
-  .section-title {
+  .modern-home .section-title {
     font-size: 1.5rem;
   }
 
-  .section-desc {
+  .modern-home .section-desc {
     font-size: 0.9rem;
   }
 
-  .btn {
+  .modern-home .btn {
     width: 100%;
     max-width: 260px;
   }
@@ -261,25 +264,25 @@ textarea {
 
 /* Extra small devices (phones ≤480px) */
 @media (max-width: 480px) {
-  .hero-title {
+  .modern-home .hero-title {
     font-size: 1.9rem;
     line-height: 1.3;
   }
 
-  .hero-subtitle {
+  .modern-home .hero-subtitle {
     font-size: 0.9rem;
     padding: 0 10px;
   }
 
-  .upload-card {
+  .modern-home .upload-card {
     padding: 18px;
   }
 
-  textarea {
+  .modern-home textarea {
     font-size: 0.9rem;
   }
 
-  .section-title {
+  .modern-home .section-title {
     font-size: 1.3rem;
   }
 }
@@ -290,11 +293,11 @@ textarea {
     max-width: 1200px;
   }
 
-  .hero-title {
+  .modern-home .hero-title {
     font-size: 3.6rem;
   }
 
-  .hero-subtitle {
+  .modern-home .hero-subtitle {
     font-size: 1.2rem;
   }
 }

@@ -6,21 +6,36 @@ import { ML_API_URL } from "../api";
 import "../page_style/templates.css";
 
 const TEMPLATE_META = {
-  Template1: { label: "Navy Sidebar",    color: "#1f4e8c", tag: "Professional", desc: "Clean two-column layout with a bold navy sidebar. Perfect for corporate roles." },
-  Template2: { label: "Classic Elegant", color: "#b45309", tag: "Executive",    desc: "Timeless black header with gold accents. Ideal for senior and executive positions." },
-  Template3: { label: "Modern Teal",     color: "#0f766e", tag: "Modern",       desc: "Gradient banner with skill bars. Great for tech and design professionals." },
-  Template4: { label: "Creative Purple", color: "#7c3aed", tag: "Creative",     desc: "Bold purple accents with a clean grid layout. Stand out in creative fields." },
-  Template5: { label: "Bold Red",        color: "#dc2626", tag: "Dynamic",      desc: "High-contrast red sidebar with project cards. Perfect for energetic profiles." },
-  Template6: { label: "Dark Tech",       color: "#0ea5e9", tag: "Developer",    desc: "Dark developer-themed resume with code-style formatting. Built for engineers." },
+  Template1: { label: "Navy Sidebar",       color: "#1f4e8c", tag: "Professional", desc: "Two-column layout with bold navy sidebar. Corporate roles." },
+  Template2: { label: "Classic Elegant",    color: "#b45309", tag: "Executive",    desc: "Black header with gold accents. Senior executive positions." },
+  Template3: { label: "Modern Teal",        color: "#0f766e", tag: "Modern",       desc: "Gradient banner with skill bars. Tech & design professionals." },
+  Template4: { label: "Creative Purple",    color: "#7c3aed", tag: "Creative",     desc: "Purple accents with grid layout. Creative fields." },
+  Template5: { label: "Bold Red",           color: "#dc2626", tag: "Dynamic",      desc: "Red sidebar with project cards. Energetic profiles." },
+  Template6: { label: "Dark Tech",          color: "#0ea5e9", tag: "Developer",    desc: "Dark developer theme with code formatting. Engineers." },
+  Template7: { label: "Minimalist Clean",   color: "#334155", tag: "Minimalist",   desc: "Ultra-clean single column. Left-aligned, no frills." },
+  Template8: { label: "Academic Scholar",   color: "#7c2d12", tag: "Education",    desc: "Research-focused with publications. Academic & research roles." },
+  Template9: { label: "Executive Premium",  color: "#1e40af", tag: "Leadership",   desc: "Achievement-focused with metrics. C-level & management." },
+  Template10: { label: "Creative Portfolio", color: "#c026d3", tag: "Designer",     desc: "Visual portfolio layout with project showcase. Designers." },
+  Template11: { label: "Timeline Progress",  color: "#059669", tag: "Growth",      desc: "Chronological timeline visualization. Career progression." },
+  Template12: { label: "Functional Skills",  color: "#d97706", tag: "Versatile",   desc: "Skills-first layout. Career changers & diverse roles." },
+  Template13: { label: "Modern Grid",        color: "#0891b2", tag: "Contemporary", desc: "Contemporary grid-based layout. Tech startups." },
+  Template14: { label: "Card Section",       color: "#7c3aed", tag: "Organized",   desc: "Card-style sections with icons. Well-organized info." },
+  Template15: { label: "Hybrid Balanced",    color: "#0f766e", tag: "Balanced",    desc: "Sidebar + modern mix. Technical & creative balance." },
 };
+
+const TEMPLATE_COUNT = Object.keys(TEMPLATE_META).length;
 
 export default function Templates() {
   const [templates, setTemplates] = useState([]);
+  const [resumeData, setResumeData] = useState(null); // ✅ Added state to hold DB data
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // 1. Fetch Templates list
     axios
       .get(`${ML_API_URL}api/templates`)
       .then((res) => setTemplates(res.data))
@@ -29,11 +44,25 @@ export default function Templates() {
         setTemplates(Object.keys(TEMPLATE_META).map((id) => ({ _id: id, name: TEMPLATE_META[id].label })));
       })
       .finally(() => setLoading(false));
+
+    // 2. ✅ Fetch the User's Resume Data directly from the database
+    if (token) {
+      axios
+        .get("http://localhost:8000/api/resumes", { // Note: Update URL if needed to match your backend
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then((res) => {
+          // If the user has saved a resume, store it in state
+          if (res.data && res.data.length > 0) {
+            setResumeData(res.data[0].data);
+          }
+        })
+        .catch((err) => console.error("Error loading resume data:", err));
+    }
   }, []);
 
   const handleSelect = async (templateId) => {
     const token = localStorage.getItem("token");
-    const resumeData = JSON.parse(localStorage.getItem("resumeData"));
 
     if (!token) return alert("Please login first");
     if (!resumeData) return alert("Please fill in your resume details first (go to Dashboard)");
@@ -45,6 +74,7 @@ export default function Templates() {
         { templateId, data: resumeData },
         { headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" } }
       );
+      // ✅ Pass the fetched data to the next page
       navigate(`/template/${templateId}`, { state: { data: resumeData } });
     } catch (err) {
       console.error(err);
@@ -52,7 +82,6 @@ export default function Templates() {
         alert("Session expired. Please login again.");
         navigate("/login");
       } else {
-        // Still navigate even if save fails — resume data is in localStorage
         navigate(`/template/${templateId}`, { state: { data: resumeData } });
       }
     } finally {
@@ -61,7 +90,10 @@ export default function Templates() {
   };
 
   const handlePreview = (templateId) => {
-    const resumeData = JSON.parse(localStorage.getItem("resumeData"));
+    // ✅ Check if we actually have data before letting them preview
+    if (!resumeData) {
+      return alert("No resume data found! Please go to the Dashboard and save your details first.");
+    }
     navigate(`/template/${templateId}`, { state: { data: resumeData } });
   };
 
@@ -71,7 +103,7 @@ export default function Templates() {
       <div className="templates-page">
         <div className="templates-hero">
           <h1 className="templates-hero-title">Choose Your Resume Template</h1>
-          <p className="templates-hero-sub">6 professionally designed templates. Pick one, preview it, and download instantly.</p>
+          <p className="templates-hero-sub">{TEMPLATE_COUNT} professionally designed templates. Pick one, preview it, and download instantly.</p>
         </div>
 
         {loading ? (

@@ -8,6 +8,91 @@
   transition: all 0.3s ease;
 }
 
+/* ===== Light Theme Overrides ===== */
+:root[data-theme="light"] .problems-page {
+  background: linear-gradient(180deg, #f8fbff, #eef2ff);
+  color: #1e293b;
+}
+
+:root[data-theme="light"] .problems-header h1 {
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+:root[data-theme="light"] .back-btn {
+  background: #e0e7ff;
+  color: #1e3a8a;
+  border-color: #93c5fd;
+}
+
+:root[data-theme="light"] .back-btn:hover {
+  background: #bfdbfe;
+  color: #1e3a8a;
+}
+
+:root[data-theme="light"] .problems-filter input {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+:root[data-theme="light"] .problems-filter input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.2);
+}
+
+:root[data-theme="light"] .filter-tag {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+:root[data-theme="light"] .filter-tag:hover {
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+:root[data-theme="light"] .filter-tag.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+:root[data-theme="light"] .problem-card {
+  background: #ffffff;
+  border-color: #dbeafe;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+:root[data-theme="light"] .problem-card:hover {
+  border-color: #60a5fa;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+}
+
+:root[data-theme="light"] .problem-header h3 {
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .problem-number {
+  color: #2563eb;
+}
+
+:root[data-theme="light"] .problem-desc,
+:root[data-theme="light"] .category,
+:root[data-theme="light"] .no-results {
+  color: #64748b;
+}
+
+:root[data-theme="light"] .solve-btn {
+  color: #1d4ed8;
+  background: #e0e7ff;
+}
+
+:root[data-theme="light"] .solve-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
 /* 🧭 ===== Header ===== */
 .problems-header {
   display: flex;

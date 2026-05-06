@@ -1,21 +1,21 @@
 /* ===== Home Page Styling ===== */
 .home-page {
   font-family: "Poppins", sans-serif;
-  background: #f9fafc;
-  color: #222;
+  background: #0b1220;
+  color: #e2e8f0;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
 /* ===== Hero Section ===== */
-.hero-section {
-  background: linear-gradient(135deg, #0052d4, #6fb1fc);
+.home-page .hero-section {
+  background: linear-gradient(135deg, #0f172a, #1e3a8a);
   color: white;
   text-align: center;
   padding: 120px 20px;
 }
 
-.hero-title {
+.home-page .hero-title {
   font-size: 2.8rem;
   font-weight: 700;
   max-width: 800px;
@@ -23,25 +23,25 @@
   line-height: 1.3;
 }
 
-.hero-title span {
-  color: #ff9800;
+.home-page .hero-title span {
+  color: #38bdf8;
 }
 
-.hero-subtitle {
+.home-page .hero-subtitle {
   margin: 20px auto 40px;
   max-width: 700px;
   font-size: 1.1rem;
-  opacity: 0.9;
+  color: #bfdbfe;
 }
 
-.button-group {
+.home-page .button-group {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 16px;
 }
 
-.btn {
+.home-page .btn {
   border: none;
   padding: 12px 28px;
   border-radius: 25px;
@@ -51,50 +51,51 @@
   text-decoration: none;
 }
 
-.primary-btn {
-  background-color: #ffffff;
-  color: #0052d4;
+.home-page .primary-btn {
+  background-color: #2563eb;
+  color: #ffffff;
 }
 
-.primary-btn:hover {
-  background-color: #e3ecff;
+.home-page .primary-btn:hover {
+  background-color: #1d4ed8;
   transform: translateY(-2px);
 }
 
-.secondary-btn {
-  background-color: #222;
-  color: #fff;
+.home-page .secondary-btn {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
 }
 
-.secondary-btn:hover {
-  background-color: #333;
+.home-page .secondary-btn:hover {
+  background-color: #1e293b;
   transform: translateY(-2px);
 }
 
-.success-btn {
-  background-color: #2ecc71;
+.home-page .success-btn {
+  background-color: #0ea5e9;
   color: #fff;
 }
 
-.success-btn:hover {
-  background-color: #28b463;
+.home-page .success-btn:hover {
+  background-color: #0284c7;
 }
 
 /* ===== Features Section ===== */
-.features-section {
+.home-page .features-section {
   margin-top: 60px;
   text-align: center;
   padding: 40px 20px 80px;
 }
 
-.section-title {
+.home-page .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #222;
+  color: #e2e8f0;
   margin-bottom: 30px;
 }
 
-.features-grid {
+.home-page .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 25px;
@@ -102,26 +103,27 @@
   margin: 0 auto;
 }
 
-.feature-card {
-  background: #fff;
+.home-page .feature-card {
+  background: #111827;
+  border: 1px solid #1f2937;
   border-radius: 16px;
   padding: 25px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.feature-card:hover {
+.home-page .feature-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
 }
 
-.feature-card h3 {
-  color: #0052d4;
+.home-page .feature-card h3 {
+  color: #38bdf8;
   margin-bottom: 10px;
 }
 
-.feature-card p {
-  color: #555;
+.home-page .feature-card p {
+  color: #cbd5e1;
   font-size: 0.95rem;
 }
 
@@ -129,75 +131,75 @@
 
 /* Large Tablets / Small Laptops */
 @media (max-width: 1024px) {
-  .hero-title {
+  .home-page .hero-title {
     font-size: 2.3rem;
   }
 
-  .hero-section {
+  .home-page .hero-section {
     padding: 100px 30px;
   }
 
-  .features-section {
+  .home-page .features-section {
     padding: 30px 15px 60px;
   }
 }
 
 /* Tablets (≤768px) */
 @media (max-width: 768px) {
-  .hero-title {
+  .home-page .hero-title {
     font-size: 2rem;
   }
 
-  .hero-subtitle {
+  .home-page .hero-subtitle {
     font-size: 1rem;
     margin-bottom: 30px;
   }
 
-  .hero-section {
+  .home-page .hero-section {
     padding: 90px 20px;
   }
 
-  .features-grid {
+  .home-page .features-grid {
     gap: 20px;
   }
 }
 
 /* Small Phones (≤480px) */
 @media (max-width: 480px) {
-  .hero-title {
+  .home-page .hero-title {
     font-size: 1.7rem;
     line-height: 1.4;
   }
 
-  .hero-subtitle {
+  .home-page .hero-subtitle {
     font-size: 0.95rem;
   }
 
-  .btn {
+  .home-page .btn {
     padding: 10px 22px;
     font-size: 0.9rem;
   }
 
-  .section-title {
+  .home-page .section-title {
     font-size: 1.4rem;
   }
 
-  .feature-card {
+  .home-page .feature-card {
     padding: 20px;
   }
 }
 
 /* Extra Small Phones (≤360px) */
 @media (max-width: 360px) {
-  .hero-title {
+  .home-page .hero-title {
     font-size: 1.5rem;
   }
 
-  .hero-subtitle {
+  .home-page .hero-subtitle {
     font-size: 0.9rem;
   }
 
-  .btn {
+  .home-page .btn {
     padding: 8px 18px;
     font-size: 0.85rem;
   }

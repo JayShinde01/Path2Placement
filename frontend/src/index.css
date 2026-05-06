@@ -42,6 +42,22 @@
 
   /* Typography */
   --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  /* Active theme defaults (dark) */
+  --app-bg: #0f172a;
+  --app-text: #f8fafc;
+}
+
+:root[data-theme="light"] {
+  --app-bg: #f4f7ff;
+  --app-text: #1e293b;
+
+  /* Make dark-token based pages switch to light automatically */
+  --dark-bg: #f4f7ff;
+  --dark-surface: #ffffff;
+  --dark-border: #e2e8f0;
+  --dark-muted: #64748b;
+  --dark-text: #1e293b;
 }
 
 /* ---- Reset ---- */
@@ -57,8 +73,9 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--light-bg);
-  color: var(--light-text);
+  background: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* ---- Shared page wrapper ---- */
@@ -81,6 +98,121 @@ body {
 .page-dark {
   background: var(--dark-bg);
   color: var(--dark-text);
+}
+
+:root[data-theme="light"] .page-dark {
+  background: var(--light-bg);
+  color: var(--light-text);
+}
+
+/* Theme toggles for major page wrappers */
+:root[data-theme="light"] .home-page {
+  background: #f9fafc;
+  color: #222;
+}
+
+:root[data-theme="light"] .home-page .hero-section {
+  background: linear-gradient(135deg, #0052d4, #6fb1fc);
+}
+
+:root[data-theme="light"] .home-page .hero-title span {
+  color: #ff9800;
+}
+
+:root[data-theme="light"] .home-page .hero-subtitle,
+:root[data-theme="light"] .home-page .feature-card p {
+  color: #555;
+}
+
+:root[data-theme="light"] .home-page .section-title {
+  color: #222;
+}
+
+:root[data-theme="light"] .home-page .feature-card {
+  background: #fff;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="light"] .home-page .feature-card h3 {
+  color: #0052d4;
+}
+
+:root[data-theme="light"] .home-page .primary-btn {
+  background-color: #ffffff;
+  color: #0052d4;
+}
+
+:root[data-theme="light"] .home-page .secondary-btn {
+  background-color: #222;
+  color: #fff;
+  border: none;
+}
+
+:root[data-theme="light"] .home-page .success-btn {
+  background-color: #2ecc71;
+}
+
+:root[data-theme="light"] .modern-home {
+  background: linear-gradient(180deg, #f4f7ff 0%, #eef1f9 100%);
+  color: #1e1e2f;
+}
+
+:root[data-theme="light"] .modern-home .hero-section {
+  background: linear-gradient(135deg, #0047ab, #4a6cf7, #73a6ff);
+}
+
+:root[data-theme="light"] .modern-home .hero-subtitle {
+  color: #e5edff;
+}
+
+:root[data-theme="light"] .modern-home .section-title {
+  color: #2c3e50;
+}
+
+:root[data-theme="light"] .modern-home .section-desc,
+:root[data-theme="light"] .modern-home .file-name,
+:root[data-theme="light"] .modern-home .checkbox-label {
+  color: #555;
+}
+
+:root[data-theme="light"] .modern-home .upload-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="light"] .modern-home .upload-label {
+  background: #eef3ff;
+  border: 2px dashed #6c8bff;
+  color: #3654ff;
+}
+
+:root[data-theme="light"] .modern-home textarea {
+  background: #fff;
+  color: #1e1e2f;
+  border: 1px solid #dcdcdc;
+}
+
+:root[data-theme="light"] .modern-home .result-section {
+  background: #f9fbff;
+  border-left: 6px solid #4a6cf7;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+:root[data-theme="light"] .modern-home .primary-btn {
+  background-color: #ffffff;
+  color: #0047ab;
+}
+
+:root[data-theme="light"] .modern-home .secondary-btn {
+  background-color: #1e1e2f;
+  color: #fff;
+  border: none;
+}
+
+:root[data-theme="light"] .modern-home .success-btn {
+  background-color: #2ecc71;
 }
 
 /* ---- Shared card ---- */

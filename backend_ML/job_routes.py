@@ -10,13 +10,17 @@ router = APIRouter()
 # 🔥 1. Recommended jobs API
 @router.post("/jobs/recommend")
 async def get_recommended_jobs(body: dict):
-    query = body.get("query", "developer")
-    location = body.get("location", "India")
-    skills = body.get("skills", [])
+    try:
+        query = body.get("query", "developer")
+        location = body.get("location", "India")
+        skills = body.get("skills", [])
 
-    jobs = recommend_jobs(query, location, skills)
+        jobs = recommend_jobs(query, location, skills)
 
-    return {"results": jobs}
+        return {"results": jobs}
+    except Exception as exc:
+        print("Job recommendation endpoint fallback:", exc)
+        return {"results": []}
 
 
 # 🔥 2. Save applied job

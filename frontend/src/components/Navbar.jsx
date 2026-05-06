@@ -15,6 +15,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [userName, setUserName] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "dark");
   const navigate  = useNavigate();
   const location  = useLocation();
 
@@ -23,6 +24,15 @@ export default function Navbar() {
     const name = localStorage.getItem("userName");
     setUserName(name || null);
   }, [location.pathname]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -38,7 +48,7 @@ export default function Navbar() {
     <nav className="navbar" role="navigation" aria-label="Main navigation">
       {/* Logo */}
       <Link to="/" className="logo" onClick={closeMenu} aria-label="Path2Placement home">
-        <h2>Path<span>2</span>Place</h2>
+        <h2>Path<span>2</span>Placement</h2>
       </Link>
 
       {/* Hamburger */}
@@ -68,6 +78,9 @@ export default function Navbar() {
         {/* Mobile auth buttons inside menu */}
         {menuOpen && (
           <li className="mobile-buttons">
+            <button type="button" className="btn btn-sm btn-outline theme-toggle" onClick={toggleTheme}>
+              {theme === "dark" ? "Light" : "Dark"}
+            </button>
             {!userName ? (
               <>
                 <Link to="/login"    className="btn btn-sm btn-outline" onClick={closeMenu}>Login</Link>
@@ -82,6 +95,9 @@ export default function Navbar() {
 
       {/* Desktop auth buttons */}
       <div className="nav-buttons">
+        <button type="button" className="btn btn-sm btn-outline theme-toggle" onClick={toggleTheme}>
+          {theme === "dark" ? "Light" : "Dark"}
+        </button>
         {!userName ? (
           <>
             <Link to="/login"    className="btn btn-sm btn-outline">Login</Link>
