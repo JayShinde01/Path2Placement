@@ -9,16 +9,17 @@ import Template1 from "./components/Template1";
 import Template2 from "./components/Template2";
 import Template3 from "./components/Template3";
 import Template4 from "./components/Template4";
+import Template5 from "./components/Template5";
+import Template6 from "./components/Template6";
 import ResumeBuilderFront from "./pages/ResumeBuilderFront";
 import ProblemsList from "./pages/ProblemsList";
 import ProblemPage from "./pages/ProblemPage";
 import CodingPracticeHome from "./pages/CodingPracticeHome";
-import Interview from "./pages/Interview"
+import Interview from "./pages/Interview";
 import Reports from "./pages/Reports";
 import JobRecommendation from "./pages/JobRecommendation";
-function App() {
- 
 
+function App() {
   return (
     <Router>
       <Routes>
@@ -39,8 +40,8 @@ function App() {
         <Route path="/template/Template2" element={<Template2 />} />
         <Route path="/template/Template3" element={<Template3 />} />
         <Route path="/template/Template4" element={<Template4 />} />
-
-       
+        <Route path="/template/Template5" element={<Template5 />} />
+        <Route path="/template/Template6" element={<Template6 />} />
       </Routes>
     </Router>
   );

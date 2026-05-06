@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import problems from "../data/problems";
+import Navbar from "../components/Navbar";
 import "../page_style/problemlist.css";
 
 function ProblemsList() {
@@ -10,15 +11,16 @@ function ProblemsList() {
 
   const filteredProblems = problems.filter((p) => {
     const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter =
-      filter === "All Topics" ? true : p.category === filter;
+    const matchesFilter = filter === "All Topics" ? true : p.category === filter;
     return matchesSearch && matchesFilter;
   });
 
   const categories = ["All Topics", "Algorithms", "Database", "Shell", "Java"];
 
   return (
-    <div className="problems-page">
+    <div className="page-wrapper page-dark">
+      <Navbar />
+      <div className="problems-page">
       {/* Header */}
       <div className="problems-header">
         <button className="back-btn" onClick={() => navigate(-1)}>
@@ -79,6 +81,7 @@ function ProblemsList() {
         {filteredProblems.length === 0 && (
           <p className="no-results">No problems found 😢</p>
         )}
+      </div>
       </div>
     </div>
   );

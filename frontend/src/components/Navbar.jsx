@@ -1,76 +1,96 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../page_style/navbar.css";
-import { FaBars, FaTimes } from "react-icons/fa"; // 👈 Add react-icons
+import { FaBars, FaTimes } from "react-icons/fa";
+
+const NAV_LINKS = [
+  { to: "/",                label: "Home" },
+  { to: "/resume",          label: "Resume Builder" },
+  { to: "/job-recommendation", label: "Job Roles" },
+  { to: "/codinghome",      label: "Coding Practice" },
+  { to: "/interview",       label: "AI Interview" },
+  { to: "/reports",         label: "Reports" },
+];
 
 export default function Navbar() {
   const [userName, setUserName] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const location  = useLocation();
 
+  // Re-read auth state whenever the route changes (covers login/logout navigation)
   useEffect(() => {
     const name = localStorage.getItem("userName");
-    if (name) setUserName(name);
-  }, []);
+    setUserName(name || null);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
     setUserName(null);
+    setMenuOpen(false);
     navigate("/login");
   };
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
-    <nav className="navbar">
-      <div className="logo">
-        <h2>
-          Path<span>2</span>Place
-        </h2>
-      </div>
+    <nav className="navbar" role="navigation" aria-label="Main navigation">
+      {/* Logo */}
+      <Link to="/" className="logo" onClick={closeMenu} aria-label="Path2Placement home">
+        <h2>Path<span>2</span>Place</h2>
+      </Link>
 
-      {/* Hamburger Icon */}
-      <div className="menu-icon" onClick={() => setMenuOpen(!menuOpen)}>
+      {/* Hamburger */}
+      <button
+        className="menu-icon"
+        onClick={() => setMenuOpen((o) => !o)}
+        aria-label={menuOpen ? "Close menu" : "Open menu"}
+        aria-expanded={menuOpen}
+      >
         {menuOpen ? <FaTimes /> : <FaBars />}
-      </div>
+      </button>
 
-      <ul className={`nav-links ${menuOpen ? "active" : ""}`}>
-        <li><Link to="/" onClick={() => setMenuOpen(false)}>Home</Link></li>
-        <li><Link to="/resume" onClick={() => setMenuOpen(false)}>Resume Builder</Link></li>
-        <li><Link to="/job-recommendation" onClick={() => setMenuOpen(false)}>Job Roles</Link></li>
-        <li><Link to="/codinghome" onClick={() => setMenuOpen(false)}>Coding Practice</Link></li>
-        <li><Link to="/interview" onClick={() => setMenuOpen(false)}>AI Interview</Link></li>
-        <li><Link to="/reports" onClick={() => setMenuOpen(false)}>Reports</Link></li>
+      {/* Links */}
+      <ul className={`nav-links ${menuOpen ? "active" : ""}`} role="list">
+        {NAV_LINKS.map(({ to, label }) => (
+          <li key={to}>
+            <Link
+              to={to}
+              onClick={closeMenu}
+              className={location.pathname === to ? "active-link" : ""}
+            >
+              {label}
+            </Link>
+          </li>
+        ))}
 
-        {/* Show buttons inside menu on mobile */}
+        {/* Mobile auth buttons inside menu */}
         {menuOpen && (
-          <div className="mobile-buttons">
+          <li className="mobile-buttons">
             {!userName ? (
               <>
-                <Link to="/login" className="small-btn">Login</Link>
-                <Link to="/register" className="small-btn outline">Register</Link>
+                <Link to="/login"    className="btn btn-sm btn-outline" onClick={closeMenu}>Login</Link>
+                <Link to="/register" className="btn btn-sm btn-primary"  onClick={closeMenu}>Register</Link>
               </>
             ) : (
-              <button onClick={handleLogout} className="small-btn logout-btn">
-                Logout
-              </button>
+              <button onClick={handleLogout} className="btn btn-sm btn-danger">Logout</button>
             )}
-          </div>
+          </li>
         )}
       </ul>
 
-      {/* Desktop buttons */}
+      {/* Desktop auth buttons */}
       <div className="nav-buttons">
         {!userName ? (
           <>
-            <Link to="/login" className="btn small-btn">Login</Link>
-            <Link to="/register" className="btn small-btn outline">Register</Link>
+            <Link to="/login"    className="btn btn-sm btn-outline">Login</Link>
+            <Link to="/register" className="btn btn-sm btn-primary">Register</Link>
           </>
         ) : (
           <div className="user-section">
             <span className="user-name">👋 {userName}</span>
-            <button onClick={handleLogout} className="btn small-btn logout-btn">
-              Logout
-            </button>
+            <button onClick={handleLogout} className="btn btn-sm btn-danger">Logout</button>
           </div>
         )}
       </div>

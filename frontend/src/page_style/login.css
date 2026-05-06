@@ -1,142 +1,117 @@
-/* ===== Login Page Background ===== */
-.login-page {
+/* ============================================================
+   Auth Pages (Login + Register) — shared styles
+   ============================================================ */
+
+.auth-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #3b82f6, #9333ea);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: "Poppins", sans-serif;
-  padding: 20px;
+  padding: 24px;
+  font-family: var(--font-sans);
 }
 
-/* ===== Login Card ===== */
-.login-container {
+.auth-card {
   background: #fff;
-  width: 400px;
-  padding: 40px 35px;
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 420px;
+  padding: 44px 40px;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   text-align: center;
-  animation: fadeIn 0.5s ease-in-out;
+  animation: authFadeIn 0.4s ease;
 }
 
-/* ===== Text Styles ===== */
-.login-title {
-  font-size: 1.8rem;
+/* Logo inside card */
+.auth-logo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #3b82f6;
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+.auth-logo span { color: #9333ea; }
+
+.auth-title {
+  font-size: 1.6rem;
   font-weight: 700;
   color: #1e3a8a;
-  margin-bottom: 10px;
+  margin: 0 0 6px;
 }
-
-.login-subtitle {
+.auth-subtitle {
   color: #6b7280;
-  margin-bottom: 25px;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  margin: 0 0 24px;
 }
 
-/* ===== Form ===== */
-.login-form {
+/* Error banner */
+.auth-error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+/* Form */
+.auth-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 14px;
 }
 
-.login-form input {
-  padding: 12px 15px;
+.auth-form input {
+  padding: 12px 14px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
-  font-size: 1rem;
-  transition: border 0.3s;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
 }
-
-.login-form input:focus {
+.auth-form input:focus {
   border-color: #3b82f6;
   outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-/* ===== Button ===== */
-.login-btn {
+.auth-btn {
   background: linear-gradient(90deg, #3b82f6, #9333ea);
   color: #fff;
   border: none;
-  padding: 12px;
+  padding: 13px;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: opacity 0.2s, transform 0.2s;
+  margin-top: 4px;
 }
+.auth-btn:hover:not(:disabled) { opacity: 0.92; transform: translateY(-1px); }
+.auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.login-btn:hover {
-  opacity: 0.9;
-  transform: scale(1.02);
-}
-
-/* ===== Footer Text ===== */
-.signup-text {
+.auth-footer-text {
   margin-top: 20px;
   color: #6b7280;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
-
-.signup-link {
+.auth-link {
   color: #3b82f6;
   font-weight: 600;
   text-decoration: none;
 }
+.auth-link:hover { text-decoration: underline; }
 
-.signup-link:hover {
-  text-decoration: underline;
+@keyframes authFadeIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== Animation ===== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===== Responsive ===== */
-
-/* Tablets (≤768px) */
-@media (max-width: 768px) {
-  .login-container {
-    width: 85%;
-    padding: 35px 25px;
-  }
-
-  .login-title {
-    font-size: 1.6rem;
-  }
-
-  .login-subtitle {
-    font-size: 0.95rem;
-  }
-}
-
-/* Small Phones (≤480px) */
+/* Responsive */
 @media (max-width: 480px) {
-  .login-container {
-    width: 95%;
-    padding: 30px 20px;
-  }
-
-  .login-title {
-    font-size: 1.4rem;
-  }
-
-  .login-btn {
-    font-size: 0.95rem;
-    padding: 10px;
-  }
-
-  .login-form input {
-    padding: 10px;
-    font-size: 0.9rem;
-  }
+  .auth-card { padding: 32px 24px; }
+  .auth-title { font-size: 1.4rem; }
 }

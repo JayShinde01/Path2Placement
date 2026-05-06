@@ -7,7 +7,7 @@ jinja2==3.1.4
 
 # --- File Handling & Parsing ---
 python-docx==1.1.2
-pymupdf==1.24.9
+PyMuPDF==1.25.5
 
 # --- Environment & Requests ---
 python-dotenv==1.0.1
@@ -18,3 +18,9 @@ google-generativeai==0.8.3
 
 # --- Optional (Logging & Async Utilities) ---
 loguru==0.7.2
+
+# --- Authentication & Security (added for JWT auth migration) ---
+motor==3.6.0
+python-jose[cryptography]==3.3.0
+bcrypt==4.3.0
+pydantic[email]==2.10.6

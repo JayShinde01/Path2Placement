@@ -1,82 +1,54 @@
 import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import "../page_style/register.css";
-import Navbar from "../components/Navbar"
-import { API_BASE_URL } from "../api";
+import "../page_style/login.css";
+import { AUTH_API_URL } from "../api";
 
 export default function Register() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
-
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}api/auth/register`, form);
-      console.log(res.data);
-      alert("Registered Successfully!");
+      await axios.post(`${AUTH_API_URL}api/auth/register`, form);
       navigate("/login");
     } catch (err) {
-      alert("Registration Failed!");
+      setError(err.response?.data?.detail || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-    <Navbar/>
-<div className="register-page">
-      <div className="register-container">
-        <h2 className="register-title">Create Your Account 🚀</h2>
-        <p className="register-subtitle">Join PlacementAI and start your placement journey</p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-logo">Path<span>2</span>Place</div>
+        <h2 className="auth-title">Create Your Account 🚀</h2>
+        <p className="auth-subtitle">Join PlacementAI and start your placement journey</p>
 
-        <form onSubmit={handleSubmit} className="register-form">
-          <input
-            name="name"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
+        {error && <div className="auth-error">{error}</div>}
 
-          <input
-            name="email"
-            type="email"
-            placeholder="Email Address"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            name="password"
-            type="password"
-            placeholder="Create Password"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-
-          <button type="submit" className="register-btn">
-            Create Account
+        <form onSubmit={handleSubmit} className="auth-form">
+          <input name="name" placeholder="Full Name" value={form.name} onChange={handleChange} required />
+          <input name="email" type="email" placeholder="Email Address" value={form.email} onChange={handleChange} required />
+          <input name="password" type="password" placeholder="Create Password (min 6 chars)" value={form.password} onChange={handleChange} required minLength={6} />
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? "Creating account…" : "Create Account"}
           </button>
         </form>
 
-        <p className="login-text">
+        <p className="auth-footer-text">
           Already have an account?{" "}
-          <Link to="/login" className="login-link">Login here</Link>
+          <Link to="/login" className="auth-link">Login here</Link>
         </p>
       </div>
     </div>
-    </>
-    
   );
 }

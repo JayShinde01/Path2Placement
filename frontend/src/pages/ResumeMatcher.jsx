@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Container, Typography, Button, Box, CircularProgress, Paper } from "@mui/material";
-import { API_BASE_URL } from "../api";
+import { ML_API_URL } from "../api";
 
 export default function ResumeMatcher() {
   const [resume, setResume] = useState(null);
@@ -13,6 +13,9 @@ export default function ResumeMatcher() {
     e.preventDefault();
     if (!resume || !jd) return alert("Please upload both resume and JD");
 
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Please login first");
+
     const formData = new FormData();
     formData.append("resume", resume);
     formData.append("jd", jd);
@@ -20,13 +23,20 @@ export default function ResumeMatcher() {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/resume-match`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const res = await axios.post(`${ML_API_URL}match`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: "Bearer " + token,
+        },
       });
       setResult(res.data);
     } catch (err) {
       console.error(err);
-      alert("Error: " + (err.response?.data?.message || "Server error"));
+      if (err.response?.status === 401) {
+        alert("Session expired. Please login again.");
+      } else {
+        alert("Error: " + (err.response?.data?.detail || "Server error"));
+      }
     } finally {
       setLoading(false);
     }
@@ -57,7 +67,9 @@ export default function ResumeMatcher() {
         {result && (
           <Box mt={4}>
             <Typography variant="h6" color="primary">Match Score: {result.match_score}%</Typography>
-            <Typography>Suggestions: {result.suggestions}</Typography>
+            <Typography><strong>✅ Matched Skills:</strong> {result.matched_skills?.join(", ") || "None"}</Typography>
+            <Typography><strong>⚠️ Missing Skills:</strong> {result.missing_skills?.join(", ") || "None"}</Typography>
+            <Typography><strong>💡 Suggestions:</strong> {result.suggestions}</Typography>
           </Box>
         )}
       </Paper>

@@ -4,50 +4,57 @@ import os
 import tempfile # For creating temporary files securely
 import json
 import requests # For making HTTP requests (will still be used, but to Google API now)
+import re
+from uuid import uuid4
 # Removed sklearn and spacy imports as matching logic will move to Gemini
 import logging # For logging application events and errors
 import google.generativeai as genai
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks,Query # FastAPI core components
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks, Query, Depends # FastAPI core components
 from fastapi.middleware.cors import CORSMiddleware # For handling Cross-Origin Resource Sharing
 from fastapi.responses import FileResponse # For sending files as responses
 from pydantic import BaseModel # For data validation with request bodies
 from typing import List, Optional # For type hinting
-import uvicorn # ASGI server for running FastAPI
 from job_apis import fetch_jobs
 from dotenv import load_dotenv
 load_dotenv()
+
+# --- Auth & DB imports (must come after load_dotenv so env vars are available) ---
+from database import init_db, close_db
+from auth import get_current_user
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from database import get_db
 # --- Logging Configuration ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# --- Lifespan: open/close MongoDB connection around the app lifetime ---
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()          # startup: connect Motor client
+    yield
+    await close_db()   # shutdown: close Motor client
 
 # --- FastAPI Application Initialization ---
 app = FastAPI(
     title="Resume Matcher & Generator API",
-    description="API for matching resumes against job descriptions and generating/improving resumes using AI."
+    description="API for matching resumes against job descriptions and generating/improving resumes using AI.",
+    lifespan=lifespan,
 )
-# --- Google Gemini API Integration ---
-# Replace YOUR_GOOGLE_GEMINI_API_KEY with your actual Google Gemini API Key
- # Your API key 
-GOOGLE_GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-2.0-flash"
 
-# CRITICAL FIX: Define the URL as a literal string to prevent any markdown parsing issues.
-# Ensure no markdown brackets or parentheses are introduced here.
-GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
-logging.info(f"DEBUG: GEMINI_API_BASE_URL (global) is set to: '{GOOGLE_GEMINI_API_KEY}'")
-
-# --- CORS (Cross-Origin Resource Sharing) Setup ---
-# This allows your frontend application (e.g., React app running on localhost:3000)
-# to make requests to this backend API.
-# FIX: Ensure origins are clean string literals
-origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+# --- CORS must be added BEFORE routers so every route gets the headers ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],     # Allow all origins (frontend URLs)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# --- Google Gemini API Integration ---
+GOOGLE_GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
+GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+logging.info("DEBUG: GEMINI_API initialized securely.")
 
 # --- USER AUTHENTICATION START ---
 # users_db = {} # This is a simple in-memory store. For production, use a proper database.
@@ -89,71 +96,6 @@ def get_jobs(query: str = Query(..., description="Job title or skill"),
 
 
 
-
-#
-
-# Request body model
-class InterviewRequest(BaseModel):
-    message: str
-
-@app.post("/interview")
-async def interview(req: InterviewRequest):
-    try:
-        print("in /interview api")
-
-        # ✅ Configure the Gemini API first
-        genai.configure(api_key=GOOGLE_GEMINI_API_KEY)
-
-        # Create a prompt for the AI interviewer
-        prompt = f"""
-You are an AI interviewer conducting a professional mock interview simulation.
-
-Step 0: If this is the user's first message, politely ask:
-"Which role or position would you like to prepare for?"
-Wait for their answer before proceeding.
-
-Step 1: Once the user provides the role, begin a realistic mock interview for that role.
-Ask **10 questions one by one** — just like in a real interview. 
-After each answer, give **brief encouraging feedback** (1-2 sentences) before moving to the next question.
-Keep the conversation natural and interactive.
-
-Step 2: After all 10 questions are answered:
-- Analyze the answers based on technical knowledge, conceptual clarity, and communication.
-- Give detailed feedback including ratings (out of 10), a short summary (5-6 lines), and an overall final rating.
-- Optionally, suggest generating a **one-page PDF report** summarizing the feedback, scores, and suggestions.
-
-Step 3: Keep your tone professional, conversational, and concise.
-Avoid long paragraphs; keep replies to 2-4 sentences.
-Encourage the candidate to answer clearly and think deeply.
-
-Additional instruction:
-The user said: "{req.message}"
-Specifically handle if the user asks: 
-"Please ask me 10 java or 10 core java question and after that give feedback according to my knowledge."
-Respond dynamically by conducting the 10-question Java interview and providing feedback at the end.
-
-Also handle requests like:
-- "Please give all feedback in a one-page PDF."
-- Treat these requests as actionable steps and confirm them politely.
-
-Always respond appropriately based on the current stage of the interview: greeting → role → question-answer → feedback → PDF/report.
-"""
-
-
-        # Use the Gemini model
-        model = genai.GenerativeModel(GEMINI_MODEL)
-        response = model.generate_content(prompt)
-
-        ai_reply = response.text.strip() if hasattr(response, "text") else "Sorry, I couldn’t generate a reply."
-        return {"reply": ai_reply}
-
-    except Exception as e:
-        logging.error(f"Interview route error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-
-        
 
 # --- Helper Functions for Text Extraction ---
 
@@ -283,7 +225,9 @@ def generate_resume_from_json(data: dict):
 async def match_resume(
     resume: UploadFile = File(..., description="The candidate's resume file (PDF or DOCX format)."),
     jd: Optional[UploadFile] = File(None, description="The job description file (PDF or DOCX format). Optional if jd_text is provided."),
-    jd_text: Optional[str] = Form(None, description="Plain text content of the job description (alternative to JD file upload).")
+    jd_text: Optional[str] = Form(None, description="Plain text content of the job description (alternative to JD file upload)."),
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """
     Matches a resume against a job description using the Google Gemini LLM.
@@ -367,11 +311,13 @@ Example JSON Structure (ensure your output strictly follows this):
                 ]
             }
         ],
-        "generationConfig": {
+
+         "generationConfig": {
             "temperature": 0.1, # Keep temperature low for more consistent results for matching
             "topK": 40,
             "topP": 0.95,
-            "maxOutputTokens": 500, # Sufficient for structured output
+            "maxOutputTokens": 2048, # Increased to prevent JSON truncation
+            "responseMimeType": "application/json", # Forces pure JSON output
         }
     }
 
@@ -447,15 +393,32 @@ Example JSON Structure (ensure your output strictly follows this):
             match_data["suggestions"] = "No specific suggestions provided by AI."
 
 
-        return {
+        result = {
             "match_score": match_data["match_score"],
-            "skill_match_score": match_data["match_score"], # Using overall match as skill match for now
-            "text_similarity_score": match_data["match_score"], # Using overall match as text similarity for now
+            "skill_match_score": match_data["match_score"],
+            "text_similarity_score": match_data["match_score"],
             "matched_skills": match_data["matched_skills"],
             "missing_skills": match_data["missing_skills"],
             "suggestions": match_data["suggestions"],
-            "job_description_extracted": job_description_content_text # Still useful to return
+            "job_description_extracted": job_description_content_text
         }
+
+        # ── Auto-save to analytics (fire-and-forget, never blocks the response) ──
+        try:
+            from datetime import datetime, timezone
+            await db["resume_scores"].insert_one({
+                "user_id": str(current_user["_id"]),
+                "match_score": match_data["match_score"],
+                "matched_skills": match_data["matched_skills"],
+                "missing_skills": match_data["missing_skills"],
+                "suggestions": match_data["suggestions"],
+                "job_title": None,
+                "created_at": datetime.now(timezone.utc),
+            })
+        except Exception as save_err:
+            logging.warning(f"Analytics auto-save failed (non-fatal): {save_err}")
+
+        return result
 
     except (json.JSONDecodeError, ValueError) as e:
         logging.error(f"Failed to parse JSON from AI match response. Error: {e}", exc_info=True)
@@ -475,7 +438,8 @@ async def generate_tailored_resume(
     resume_file: UploadFile = File(..., description="The candidate's resume file (PDF or DOCX format)."),
     jd_file: Optional[UploadFile] = File(None, description="The job description file (PDF or DOCX format). Optional if jd_text is provided."),
     jd_text_input: Optional[str] = Form(None, description="Plain text content of the job description (alternative to JD file upload)."),
-    resume_style: str = Form("Chronological", description="Desired resume style: 'Chronological', 'Functional', or 'Hybrid'.")
+    resume_style: str = Form("Chronological", description="Desired resume style: 'Chronological', 'Functional', or 'Hybrid'."),
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Generates a job-targeted resume using the Google Gemini LLM based on an existing resume's content
@@ -501,10 +465,10 @@ async def generate_tailored_resume(
     job_description_text = jd_text_input
     if jd_file:
         logging.info(f"Processing JD file for tailored generation: {jd_file.filename}")
-        jd_bytes = await jd.read()
-        if jd.filename.endswith(".pdf"):
+        jd_bytes = await jd_file.read()
+        if jd_file.filename.endswith(".pdf"):
             job_description_text = extract_text_from_pdf(jd_bytes)
-        elif jd.filename.lower().endswith((".docx", ".doc")):
+        elif jd_file.filename.lower().endswith((".docx", ".doc")):
             job_description_text = extract_text_from_docx(jd_bytes)
         else:
             logging.error(f"Unsupported JD file format for tailored generation: {jd_file.filename}")
@@ -588,11 +552,12 @@ Return only valid JSON in this exact structure, without any additional text, mar
                 ]
             }
         ],
-        "generationConfig": {
+       "generationConfig": {
             "temperature": 0.7,
             "topK": 40,
             "topP": 0.95,
-            "maxOutputTokens": 1800, # Increased max output tokens further to allow for more detailed resumes
+            "maxOutputTokens": 4096, # Increased max output tokens further to allow for more detailed resumes
+            "responseMimeType": "application/json", # Forces pure JSON output
         }
     }
 
@@ -694,11 +659,104 @@ Return only valid JSON in this exact structure, without any additional text, mar
 
 
 
-port = int(os.getenv("PORT", 8000))
-# --- Main Entry Point ---
-# Runs the FastAPI application using Uvicorn.
-if __name__ == "__main__":
-    # Host '0.0.0.0' makes the server accessible from other devices on the network,
-    # not just localhost, which is useful for testing in different environments.
-    # Port 8000 is the standard port used in your original setup.
-    uvicorn.run(app, host="0.0.0.0", port=port)
+# ── Static template catalogue ──────────────────────────────────────────────
+from datetime import datetime, timezone as _tz
+from bson import ObjectId as _ObjectId
+
+_TEMPLATES = [
+    {"_id": "Template1", "name": "Navy Sidebar",    "thumbnail": "/t1.jpg", "tag": "Professional"},
+    {"_id": "Template2", "name": "Classic Elegant", "thumbnail": "/t2.jpg", "tag": "Executive"},
+    {"_id": "Template3", "name": "Modern Teal",     "thumbnail": "/t3.jpg", "tag": "Modern"},
+    {"_id": "Template4", "name": "Creative Purple", "thumbnail": "/t4.jpg", "tag": "Creative"},
+    {"_id": "Template5", "name": "Bold Red",        "thumbnail": "/t5.jpg", "tag": "Dynamic"},
+    {"_id": "Template6", "name": "Dark Tech",       "thumbnail": "/t6.jpg", "tag": "Developer"},
+]
+
+
+@app.get("/api/templates")
+async def get_templates():
+    """Return the list of available resume templates."""
+    return _TEMPLATES
+
+
+class ResumeCreateBody(BaseModel):
+    templateId: str
+    data: dict
+
+
+@app.post("/api/resumes", status_code=201)
+async def create_resume(
+    body: ResumeCreateBody,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """
+    Save a resume document linked to the authenticated user.
+    Mirrors the old Node POST /api/resumes endpoint.
+    """
+    doc = {
+        "user_id": str(current_user["_id"]),
+        "templateId": body.templateId,
+        "data": body.data,
+        "created_at": datetime.now(_tz.utc),
+    }
+    result = await db["resumes"].insert_one(doc)
+    return {"msg": "Resume saved", "id": str(result.inserted_id)}
+
+
+@app.get("/api/resumes")
+async def get_resumes(
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """Return all resumes for the authenticated user."""
+    cursor = db["resumes"].find(
+        {"user_id": str(current_user["_id"])},
+        sort=[("created_at", -1)],
+    )
+    docs = await cursor.to_list(length=100)
+    for d in docs:
+        d["_id"] = str(d["_id"])
+    return docs
+
+
+@app.get("/api/resumes/{resume_id}")
+async def get_resume(
+    resume_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """Return a single resume by ID (must belong to the authenticated user)."""
+    try:
+        oid = _ObjectId(resume_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid resume ID")
+
+    doc = await db["resumes"].find_one(
+        {"_id": oid, "user_id": str(current_user["_id"])}
+    )
+    if not doc:
+        raise HTTPException(status_code=404, detail="Resume not found")
+    doc["_id"] = str(doc["_id"])
+    return doc
+
+
+@app.delete("/api/resumes/{resume_id}", status_code=204)
+async def delete_resume(
+    resume_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """Delete a resume by ID (must belong to the authenticated user)."""
+    try:
+        oid = _ObjectId(resume_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid resume ID")
+
+    result = await db["resumes"].delete_one(
+        {"_id": oid, "user_id": str(current_user["_id"])}
+    )
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Resume not found")
+    return None
+

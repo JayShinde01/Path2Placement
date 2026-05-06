@@ -352,6 +352,395 @@ public:
       { input: [5], expected: 120 },
     ],
   },
+  {
+    id: "valid-parentheses",
+    title: "Valid Parentheses",
+    difficulty: "Easy",
+    category: "String",
+    description: `Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+An input string is valid if:
+1. Open brackets must be closed by the same type of brackets.
+2. Open brackets must be closed in the correct order.
+3. Every close bracket has a corresponding open bracket of the same type.`,
+    examples: [
+      { input: 's = "()"', output: "true" },
+      { input: 's = "()[]{}"', output: "true" },
+      { input: 's = "(]"', output: "false" }
+    ],
+    starterCode: {
+      javascript: `function isValid(s) {
+  // Write your solution here
+}`,
+      python: `def is_valid(s):
+    # Write your solution here
+    pass`,
+      java: `class Solution {
+    public boolean isValid(String s) {
+        // Write your solution here
+    }
+}`,
+      cpp: `class Solution {
+public:
+    bool isValid(string s) {
+        // Write your solution here
+    }
+};`
+    },
+    solution: {
+      javascript: `function isValid(s) {
+  const stack = [];
+  const map = { ')': '(', '}': '{', ']': '[' };
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === '(' || s[i] === '{' || s[i] === '[') {
+      stack.push(s[i]);
+    } else {
+      if (stack.length === 0 || stack.pop() !== map[s[i]]) {
+        return false;
+      }
+    }
+  }
+  return stack.length === 0;
+}`,
+      python: `def is_valid(s):
+    stack = []
+    mapping = {")": "(", "}": "{", "]": "["}
+    for char in s:
+        if char in mapping:
+            top_element = stack.pop() if stack else '#'
+            if mapping[char] != top_element:
+                return False
+        else:
+            stack.append(char)
+    return not stack`,
+      java: `class Solution {
+    public boolean isValid(String s) {
+        Stack<Character> stack = new Stack<>();
+        for (char c : s.toCharArray()) {
+            if (c == '(') stack.push(')');
+            else if (c == '{') stack.push('}');
+            else if (c == '[') stack.push(']');
+            else if (stack.isEmpty() || stack.pop() != c) return false;
+        }
+        return stack.isEmpty();
+    }
+}`,
+      cpp: `class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> st;
+        for(char c : s){
+            if(c == '(' || c == '{' || c == '[') st.push(c);
+            else {
+                if(st.empty()) return false;
+                if(c == ')' && st.top() != '(') return false;
+                if(c == '}' && st.top() != '{') return false;
+                if(c == ']' && st.top() != '[') return false;
+                st.pop();
+            }
+        }
+        return st.empty();
+    }
+};`
+    },
+    testCases: [
+      { input: ["()"], expected: true },
+      { input: ["()[]{}"], expected: true },
+      { input: ["(]"], expected: false },
+      { input: ["([)]"], expected: false },
+    ],
+  },
+  {
+    id: "contains-duplicate",
+    title: "Contains Duplicate",
+    difficulty: "Easy",
+    category: "Array",
+    description: `Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.`,
+    examples: [
+      { input: "nums = [1,2,3,1]", output: "true" },
+      { input: "nums = [1,2,3,4]", output: "false" },
+      { input: "nums = [1,1,1,3,3,4,3,2,4,2]", output: "true" }
+    ],
+    starterCode: {
+      javascript: `function containsDuplicate(nums) {
+  // Write your solution here
+}`,
+      python: `def contains_duplicate(nums):
+    # Write your solution here
+    pass`,
+      java: `class Solution {
+    public boolean containsDuplicate(int[] nums) {
+        // Write your solution here
+    }
+}`,
+      cpp: `class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        // Write your solution here
+    }
+};`
+    },
+    solution: {
+      javascript: `function containsDuplicate(nums) {
+  const set = new Set(nums);
+  return set.size !== nums.length;
+}`,
+      python: `def contains_duplicate(nums):
+    return len(set(nums)) != len(nums)`,
+      java: `class Solution {
+    public boolean containsDuplicate(int[] nums) {
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            if (!set.add(num)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}`,
+      cpp: `class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        unordered_set<int> seen;
+        for (int num : nums) {
+            if (seen.count(num)) return true;
+            seen.insert(num);
+        }
+        return false;
+    }
+};`
+    },
+    testCases: [
+      { input: [[1, 2, 3, 1]], expected: true },
+      { input: [[1, 2, 3, 4]], expected: false },
+      { input: [[1, 1, 1, 3, 3, 4, 3, 2, 4, 2]], expected: true },
+    ],
+  },
+  {
+    id: "valid-anagram",
+    title: "Valid Anagram",
+    difficulty: "Easy",
+    category: "String",
+    description: `Given two strings s and t, return true if t is an anagram of s, and false otherwise.
+
+An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.`,
+    examples: [
+      { input: 's = "anagram", t = "nagaram"', output: "true" },
+      { input: 's = "rat", t = "car"', output: "false" }
+    ],
+    starterCode: {
+      javascript: `function isAnagram(s, t) {
+  // Write your solution here
+}`,
+      python: `def is_anagram(s, t):
+    # Write your solution here
+    pass`,
+      java: `class Solution {
+    public boolean isAnagram(String s, String t) {
+        // Write your solution here
+    }
+}`,
+      cpp: `class Solution {
+public:
+    bool isAnagram(string s, string t) {
+        // Write your solution here
+    }
+};`
+    },
+    solution: {
+      javascript: `function isAnagram(s, t) {
+  if (s.length !== t.length) return false;
+  return s.split('').sort().join('') === t.split('').sort().join('');
+}`,
+      python: `def is_anagram(s, t):
+    if len(s) != len(t):
+        return False
+    return sorted(s) == sorted(t)`,
+      java: `class Solution {
+    public boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()) return false;
+        char[] sChars = s.toCharArray();
+        char[] tChars = t.toCharArray();
+        Arrays.sort(sChars);
+        Arrays.sort(tChars);
+        return Arrays.equals(sChars, tChars);
+    }
+}`,
+      cpp: `class Solution {
+public:
+    bool isAnagram(string s, string t) {
+        if (s.length() != t.length()) return false;
+        sort(s.begin(), s.end());
+        sort(t.begin(), t.end());
+        return s == t;
+    }
+};`
+    },
+    testCases: [
+      { input: ["anagram", "nagaram"], expected: true },
+      { input: ["rat", "car"], expected: false },
+      { input: ["a", "ab"], expected: false },
+    ],
+  },
+  {
+    id: "best-time-to-buy-and-sell-stock",
+    title: "Best Time to Buy and Sell Stock",
+    difficulty: "Easy",
+    category: "Array",
+    description: `You are given an array prices where prices[i] is the price of a given stock on the ith day.
+
+You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+
+Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.`,
+    examples: [
+      { input: "prices = [7,1,5,3,6,4]", output: "5", explanation: "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5." },
+      { input: "prices = [7,6,4,3,1]", output: "0", explanation: "In this case, no transactions are done and the max profit = 0." }
+    ],
+    starterCode: {
+      javascript: `function maxProfit(prices) {
+  // Write your solution here
+}`,
+      python: `def max_profit(prices):
+    # Write your solution here
+    pass`,
+      java: `class Solution {
+    public int maxProfit(int[] prices) {
+        // Write your solution here
+    }
+}`,
+      cpp: `class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        // Write your solution here
+    }
+};`
+    },
+    solution: {
+      javascript: `function maxProfit(prices) {
+  let minPrice = Infinity;
+  let maxProfit = 0;
+  for (let i = 0; i < prices.length; i++) {
+    if (prices[i] < minPrice) {
+      minPrice = prices[i];
+    } else if (prices[i] - minPrice > maxProfit) {
+      maxProfit = prices[i] - minPrice;
+    }
+  }
+  return maxProfit;
+}`,
+      python: `def max_profit(prices):
+    min_price = float('inf')
+    max_profit = 0
+    for price in prices:
+        if price < min_price:
+            min_price = price
+        elif price - min_price > max_profit:
+            max_profit = price - min_price
+    return max_profit`,
+      java: `class Solution {
+    public int maxProfit(int[] prices) {
+        int minPrice = Integer.MAX_VALUE;
+        int maxProfit = 0;
+        for (int i = 0; i < prices.length; i++) {
+            if (prices[i] < minPrice) {
+                minPrice = prices[i];
+            } else if (prices[i] - minPrice > maxProfit) {
+                maxProfit = prices[i] - minPrice;
+            }
+        }
+        return maxProfit;
+    }
+}`,
+      cpp: `class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int minPrice = INT_MAX;
+        int maxProfit = 0;
+        for (int price : prices) {
+            minPrice = min(minPrice, price);
+            maxProfit = max(maxProfit, price - minPrice);
+        }
+        return maxProfit;
+    }
+};`
+    },
+    testCases: [
+      { input: [[7, 1, 5, 3, 6, 4]], expected: 5 },
+      { input: [[7, 6, 4, 3, 1]], expected: 0 },
+      { input: [[1, 2]], expected: 1 },
+    ],
+  },
+  {
+    id: "single-number",
+    title: "Single Number",
+    difficulty: "Easy",
+    category: "Array",
+    description: `Given a non-empty array of integers nums, every element appears twice except for one. Find that single one.
+
+You must implement a solution with a linear runtime complexity and use only constant extra space.`,
+    examples: [
+      { input: "nums = [2,2,1]", output: "1" },
+      { input: "nums = [4,1,2,1,2]", output: "4" },
+      { input: "nums = [1]", output: "1" }
+    ],
+    starterCode: {
+      javascript: `function singleNumber(nums) {
+  // Write your solution here
+}`,
+      python: `def single_number(nums):
+    # Write your solution here
+    pass`,
+      java: `class Solution {
+    public int singleNumber(int[] nums) {
+        // Write your solution here
+    }
+}`,
+      cpp: `class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        // Write your solution here
+    }
+};`
+    },
+    solution: {
+      javascript: `function singleNumber(nums) {
+  let result = 0;
+  for (let num of nums) {
+    result ^= num;
+  }
+  return result;
+}`,
+      python: `def single_number(nums):
+    result = 0
+    for num in nums:
+        result ^= num
+    return result`,
+      java: `class Solution {
+    public int singleNumber(int[] nums) {
+        int result = 0;
+        for (int num : nums) {
+            result ^= num;
+        }
+        return result;
+    }
+}`,
+      cpp: `class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int result = 0;
+        for (int num : nums) {
+            result ^= num;
+        }
+        return result;
+    }
+};`
+    },
+    testCases: [
+      { input: [[2, 2, 1]], expected: 1 },
+      { input: [[4, 1, 2, 1, 2]], expected: 4 },
+      { input: [[1]], expected: 1 },
+    ],
+  }
 ];
 
 export default problems;

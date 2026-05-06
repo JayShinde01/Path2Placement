@@ -53,6 +53,9 @@ export default function ResumeBuilderFront() {
       return;
     }
 
+    const token = localStorage.getItem("token");
+    if (!token) { showSnackbar("Please login first.", "warning"); return; }
+
     const formData = new FormData();
     formData.append("resume", resume);
     jdTextMode ? formData.append("jd_text", jdText) : formData.append("jd", jd);
@@ -62,13 +65,20 @@ export default function ResumeBuilderFront() {
 
     try {
       const res = await axios.post(`${ML_API_URL}match`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: "Bearer " + token,
+        },
       });
       setResult(res.data);
       showSnackbar("Resume analyzed successfully using AI!", "success");
     } catch (err) {
       console.error(err);
-      showSnackbar("Error analyzing resume. Check backend.", "error");
+      if (err.response?.status === 401) {
+        showSnackbar("Session expired. Please login again.", "error");
+      } else {
+        showSnackbar("Error analyzing resume. Check backend.", "error");
+      }
     } finally {
       setLoading(false);
     }
@@ -79,6 +89,9 @@ export default function ResumeBuilderFront() {
       showSnackbar("Please upload resume and JD first.", "warning");
       return;
     }
+
+    const token = localStorage.getItem("token");
+    if (!token) { showSnackbar("Please login first.", "warning"); return; }
 
     setLoading(true);
     setGeneratedResumeUrl(null);
@@ -94,7 +107,10 @@ export default function ResumeBuilderFront() {
       const res = await axios.post(
         `${ML_API_URL}generate_tailored_resume`,
         formData,
-        { responseType: "blob" }
+        {
+          responseType: "blob",
+          headers: { Authorization: "Bearer " + token },
+        }
       );
 
       const blob = new Blob([res.data], {

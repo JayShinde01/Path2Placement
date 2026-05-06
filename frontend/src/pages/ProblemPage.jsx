@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Editor } from "@monaco-editor/react";
 import problems from "../data/problems";
 import { TestResults } from "../components/TestResults";
+import axios from "axios";
+import { ML_API_URL } from "../api";
 
 function ProblemPage() {
   const { id } = useParams();
@@ -23,6 +25,8 @@ function ProblemPage() {
     java: { name: "java", version: "15.0.2", ext: "java" },
     cpp: { name: "cpp", version: "10.2.0", ext: "cpp" },
   };
+
+  const PISTON_URL = import.meta.env.VITE_PISTON_URL || "http://localhost:2000";
 
   // ✅ MAIN LOGIC: Run user's full code directly
   const runCode = async () => {
@@ -45,11 +49,22 @@ function ProblemPage() {
       };
 
       try {
-        const res = await fetch("https://emkc.org/api/v2/piston/execute", {
+        const res = await fetch(`${PISTON_URL}/api/v2/execute`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
+
+        if (res.status === 401 || res.status === 403) {
+          results.push({
+            passed: false,
+            input: inputStr,
+            expected: testCase.expected.toString(),
+            actual: "",
+            error: "Code executor is not available. Start the local Piston server (see README).",
+          });
+          continue;
+        }
 
         const data = await res.json();
 
@@ -79,7 +94,7 @@ function ProblemPage() {
           input: inputStr,
           expected: testCase.expected.toString(),
           actual: "",
-          error: "Error executing code",
+          error: "Cannot reach code executor. Is the local Piston server running on port 2000?",
         });
       }
     }
@@ -87,6 +102,23 @@ function ProblemPage() {
     setTestResults(results);
     setAllPassed(results.every((r) => r.passed));
     setIsRunning(false);
+
+    // ── Save coding activity to analytics (fire-and-forget) ──
+    const token = localStorage.getItem("token");
+    if (token) {
+      const passed = results.every((r) => r.passed);
+      axios.post(
+        `${ML_API_URL}api/analytics/coding-activity`,
+        {
+          problem_id:    problem.id,
+          problem_title: problem.title,
+          language:      language,
+          passed:        passed,
+          difficulty:    problem.difficulty || null,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      ).catch(() => {}); // silent — never block the UI
+    }
   };
 
   const resetCode = () => {
