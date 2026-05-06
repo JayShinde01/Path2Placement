@@ -1,21 +1,39 @@
 import logging
 import re
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 from uuid import uuid4
 
-import google.generativeai as genai
+from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
 from auth import get_current_user
 from database import get_db
-from resume_matcher import GOOGLE_GEMINI_API_KEY, GEMINI_MODEL
+from gemini_client import GOOGLE_GEMINI_API_KEY, generate_gemini_text
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["interview"])
+
+
+# ---------------------------------------------------------------------------
+# Serialization helper — converts ObjectId → str, datetime → ISO string
+# so FastAPI's JSON encoder never sees a raw BSON type.
+# ---------------------------------------------------------------------------
+
+def _serialize(doc: Any) -> Any:
+    """Recursively convert MongoDB document to JSON-safe types."""
+    if isinstance(doc, dict):
+        return {k: _serialize(v) for k, v in doc.items()}
+    if isinstance(doc, list):
+        return [_serialize(v) for v in doc]
+    if isinstance(doc, ObjectId):
+        return str(doc)
+    if isinstance(doc, datetime):
+        return doc.isoformat()
+    return doc
 
 
 class InterviewRequest(BaseModel):
@@ -150,7 +168,6 @@ async def _build_answer_feedback(role: str, question: str, answer: str) -> str:
     if not GOOGLE_GEMINI_API_KEY:
         return "Good answer. Keep it focused and add one concrete example to make it stronger."
 
-    genai.configure(api_key=GOOGLE_GEMINI_API_KEY)
     prompt = f"""
 You are a calm, human-like interview coach.
 Write 1-2 sentences of brief encouraging feedback on the candidate's answer.
@@ -161,9 +178,7 @@ Role: {role}
 Question: {question}
 Candidate answer: {answer}
 """
-    model = genai.GenerativeModel(GEMINI_MODEL)
-    response = model.generate_content(prompt)
-    text = response.text.strip() if hasattr(response, "text") and response.text else ""
+    text = generate_gemini_text(prompt, task="interview_feedback")
     return text or "Good answer. Keep it focused and add one concrete example to make it stronger."
 
 
@@ -174,7 +189,6 @@ async def _build_final_feedback(role: str, transcript: list[dict]) -> str:
             "Improve by giving more concrete examples and structuring answers with impact. Final rating: 7/10."
         )
 
-    genai.configure(api_key=GOOGLE_GEMINI_API_KEY)
     transcript_text = "\n".join(
         f"Q{i + 1}: {item.get('question', '')}\nA{i + 1}: {item.get('message', '')}"
         for i, item in enumerate(transcript)
@@ -197,9 +211,7 @@ Role: {role}
 Transcript:
 {transcript_text}
 """
-    model = genai.GenerativeModel(GEMINI_MODEL)
-    response = model.generate_content(prompt)
-    text = response.text.strip() if hasattr(response, "text") and response.text else ""
+    text = generate_gemini_text(prompt, task="interview_final_feedback")
     return text or (
         f"You completed the {role} mock interview. Strong areas: clarity and consistency. "
         "Improve by giving more concrete examples and structuring answers with impact. Final rating: 7/10."
@@ -404,8 +416,8 @@ async def list_interview_sessions(
                 "status": session.get("status"),
                 "question_index": session.get("question_index", 0),
                 "turn_count": session.get("turn_count", 0),
-                "created_at": session.get("created_at"),
-                "updated_at": session.get("updated_at"),
+                "created_at": _serialize(session.get("created_at")),
+                "updated_at": _serialize(session.get("updated_at")),
                 "has_feedback": bool(session.get("final_feedback")),
                 "final_feedback": session.get("final_feedback"),
             }
@@ -431,6 +443,7 @@ async def get_interview_session_detail(
         sort=[("created_at", 1)],
     )
     turns = await cursor.to_list(length=200)
+
     return {
         "session": {
             "session_id": session.get("session_id"),
@@ -439,9 +452,21 @@ async def get_interview_session_detail(
             "question_index": session.get("question_index", 0),
             "turn_count": session.get("turn_count", 0),
             "final_feedback": session.get("final_feedback"),
-            "created_at": session.get("created_at"),
-            "updated_at": session.get("updated_at"),
-            "completed_at": session.get("completed_at"),
+            "created_at": _serialize(session.get("created_at")),
+            "updated_at": _serialize(session.get("updated_at")),
+            "completed_at": _serialize(session.get("completed_at")),
         },
-        "transcript": turns,
+        "transcript": [
+            {
+                "role": t.get("role"),
+                "stage": t.get("stage"),
+                "question_index": t.get("question_index"),
+                "question": t.get("question"),
+                "message": t.get("message"),
+                "ai_reply": t.get("ai_reply"),
+                "is_feedback": t.get("is_feedback", False),
+                "created_at": _serialize(t.get("created_at")),
+            }
+            for t in turns
+        ],
     }

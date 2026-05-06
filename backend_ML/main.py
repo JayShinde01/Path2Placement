@@ -8,11 +8,13 @@ load_dotenv()
 from analytics import router as analytics_router
 from auth import router as auth_router
 from interview_api import router as interview_router
+from assistant_api import router as assistant_router
 from resume_matcher import app
 
 app.include_router(auth_router)
 app.include_router(analytics_router)
 app.include_router(interview_router)
+app.include_router(assistant_router)
 
 
 if __name__ == "__main__":

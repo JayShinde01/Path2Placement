@@ -1,0 +1,348 @@
+/* ─── Floating Assistant Button ──────────────────────────────────────── */
+
+.floating-assistant-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  box-shadow: 
+    0 10px 30px rgba(59, 130, 246, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  z-index: 999;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  outline: none;
+}
+
+.floating-assistant-btn:hover {
+  box-shadow: 
+    0 14px 40px rgba(59, 130, 246, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+}
+
+.floating-assistant-btn:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+.fab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Pulse ring animation */
+.fab-pulse {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  pointer-events: none;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* ─── Modal Backdrop ─────────────────────────────────────────────────── */
+
+.assistant-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+}
+
+/* ─── Modal Container ────────────────────────────────────────────────── */
+
+.assistant-modal {
+  position: fixed;
+  bottom: 120px;
+  right: 28px;
+  width: 480px;
+  max-height: 680px;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  border-radius: 16px;
+  box-shadow: 
+    0 25px 70px rgba(0, 0, 0, 0.7),
+    0 0 1px rgba(59, 130, 246, 0.3);
+  z-index: 1001;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Close Button */
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #475569;
+  background-color: rgba(30, 41, 59, 0.8);
+  color: #cbd5e1;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.modal-close-btn:hover {
+  background-color: rgba(45, 60, 90, 0.9);
+  border-color: #64748b;
+  color: #f1f5f9;
+}
+
+.modal-close-btn:active {
+  transform: scale(0.92);
+}
+
+/* ─── Responsive Design ──────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .floating-assistant-btn {
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
+
+  .fab-pulse {
+    width: 60px;
+    height: 60px;
+  }
+
+  .assistant-modal {
+    bottom: 90px;
+    right: 16px;
+    left: auto;
+    width: 440px;
+    max-height: 600px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .floating-assistant-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    font-size: 26px;
+  }
+
+  .fab-pulse {
+    width: 56px;
+    height: 56px;
+  }
+
+  .assistant-modal {
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    transform: none;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .modal-close-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    top: 12px;
+    right: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .floating-assistant-btn {
+    bottom: 12px;
+    right: 12px;
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+  }
+
+  .fab-pulse {
+    width: 52px;
+    height: 52px;
+  }
+
+  .assistant-modal {
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    height: auto;
+    border-radius: 12px;
+  }
+}
+
+/* ─── Ensure PersonalAssistant inside modal fills correctly ──────────── */
+.assistant-modal .assistant-wrapper {
+  border-radius: 0;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.assistant-modal .assistant-header {
+  background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  flex-shrink: 0;
+}
+
+.assistant-modal .assistant-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.assistant-modal .assistant-subtitle {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.assistant-modal .assistant-body {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  border: none;
+  background: transparent;
+}
+
+.assistant-modal .insights-panel {
+  background-color: rgba(30, 41, 59, 0.5);
+  border-right: 1px solid #334155;
+  border-bottom: none;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.assistant-modal .chat-panel {
+  background-color: #0f172a;
+  border-left: 1px solid #334155;
+  overflow: hidden;
+}
+
+.assistant-modal .messages-container {
+  max-height: 350px;
+  padding: 14px 12px;
+}
+
+.assistant-modal .chat-form {
+  padding: 12px;
+  border-top: 1px solid #334155;
+  background-color: rgba(30, 41, 59, 0.8);
+  gap: 6px;
+}
+
+.assistant-modal .chat-input {
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.assistant-modal .btn-send {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .assistant-modal .assistant-wrapper {
+    height: 100%;
+  }
+
+  .assistant-modal .assistant-body {
+    grid-template-columns: 1fr;
+  }
+
+  .assistant-modal .insights-panel {
+    border-right: none;
+    border-bottom: 1px solid #334155;
+    display: none;
+  }
+
+  .assistant-modal .chat-panel {
+    border-left: none;
+  }
+
+  .assistant-modal .messages-container {
+    max-height: none;
+    min-height: 0;
+  }
+
+  .assistant-modal .chat-form {
+    padding: 10px;
+  }
+
+  .assistant-modal .chat-input {
+    font-size: 14px;
+  }
+
+  .assistant-modal .btn-send {
+    min-width: 44px;
+  }
+}

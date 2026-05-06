@@ -715,9 +715,16 @@ async def get_resumes(
         sort=[("created_at", -1)],
     )
     docs = await cursor.to_list(length=100)
+    result = []
     for d in docs:
-        d["_id"] = str(d["_id"])
-    return docs
+        result.append({
+            "_id": str(d["_id"]),
+            "user_id": d.get("user_id"),
+            "templateId": d.get("templateId"),
+            "data": d.get("data"),
+            "created_at": d["created_at"].isoformat() if isinstance(d.get("created_at"), datetime) else d.get("created_at"),
+        })
+    return result
 
 
 @app.get("/api/resumes/{resume_id}")
@@ -737,8 +744,13 @@ async def get_resume(
     )
     if not doc:
         raise HTTPException(status_code=404, detail="Resume not found")
-    doc["_id"] = str(doc["_id"])
-    return doc
+    return {
+        "_id": str(doc["_id"]),
+        "user_id": doc.get("user_id"),
+        "templateId": doc.get("templateId"),
+        "data": doc.get("data"),
+        "created_at": doc["created_at"].isoformat() if isinstance(doc.get("created_at"), datetime) else doc.get("created_at"),
+    }
 
 
 @app.delete("/api/resumes/{resume_id}", status_code=204)

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,6 +19,48 @@ const TOOLTIP = {
   color: "#f8fafc",
   borderRadius: "8px",
   fontSize: "13px",
+};
+const REPORTS_CACHE_KEY = "placementai:reports-summary:v1";
+
+const readCache = () => {
+  try {
+    const raw = localStorage.getItem(REPORTS_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeCache = (value) => {
+  try {
+    localStorage.setItem(REPORTS_CACHE_KEY, JSON.stringify(value));
+  } catch {
+    // Ignore storage quota / privacy mode issues.
+  }
+};
+
+const emptyReportsData = {
+  readiness_score: 0,
+  resume: { avg_score: 0, trend: [], total_scans: 0, top_missing: [], top_matched: [], last_suggestions: "" },
+  coding: { accuracy_pct: 0, lang_chart: [], total_solved: 0, total_attempts: 0 },
+  interview: { total_sessions: 0, roles_practiced: [], feedback_count: 0, recent_feedback: [] },
+  jobs: { total_saved: 0, source_counts: [], recent: [] },
+  skill_gap: [],
+  recommendations: [],
+};
+
+const normalizeReportsData = (value) => {
+  const source = value?.data ?? value ?? {};
+  return {
+    ...emptyReportsData,
+    ...source,
+    resume: { ...emptyReportsData.resume, ...(source.resume || {}) },
+    coding: { ...emptyReportsData.coding, ...(source.coding || {}) },
+    interview: { ...emptyReportsData.interview, ...(source.interview || {}) },
+    jobs: { ...emptyReportsData.jobs, ...(source.jobs || {}) },
+    skill_gap: Array.isArray(source.skill_gap) ? source.skill_gap : [],
+    recommendations: Array.isArray(source.recommendations) ? source.recommendations : [],
+  };
 };
 
 // ─── tiny helpers ─────────────────────────────────────────────────────────
@@ -50,32 +92,54 @@ export default function Reports() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  const [data, setData]       = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+  const [data, setData] = useState(() => normalizeReportsData(readCache()));
+  const [loading, setLoading] = useState(() => !readCache());
+  const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchSummary = useCallback(async () => {
+  const fetchSummary = async (background = false) => {
     if (!token) return;
-    setLoading(true);
+    const hasCachedData = Boolean(readCache());
+    if (background && hasCachedData) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
     setError(null);
     try {
       const res = await axios.get(`${ML_API_URL}api/analytics/summary`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setData(res.data);
+      const nextData = normalizeReportsData(res.data);
+      setData(nextData);
+      writeCache({ data: nextData, savedAt: Date.now() });
     } catch (err) {
       console.error(err);
-      setError(
-        err.response?.status === 401
-          ? "Session expired. Please login again."
-          : "Could not load analytics. Make sure the ML service is running."
-      );
+      if (!hasCachedData) {
+        setError(
+          err.response?.status === 401
+            ? "Session expired. Please login again."
+            : "Could not load analytics. Make sure the ML service is running."
+        );
+      } else {
+        setError(
+          err.response?.status === 401
+            ? "Using saved analytics. Sign in again to refresh live data."
+            : "Using saved analytics while the live refresh is unavailable."
+        );
+      }
     } finally {
-      setLoading(false);
+      if (background && hasCachedData) {
+        setRefreshing(false);
+      } else {
+        setLoading(false);
+      }
     }
-  }, [token]);
+  };
 
-  useEffect(() => { fetchSummary(); }, [fetchSummary]);
+  useEffect(() => {
+    fetchSummary(Boolean(readCache()));
+  }, []);
 
   // ── auth gate ────────────────────────────────────────────────────────
   if (!token) {
@@ -96,7 +160,7 @@ export default function Reports() {
   }
 
   // ── loading ──────────────────────────────────────────────────────────
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="page-wrapper page-dark">
         <Navbar />
@@ -111,7 +175,7 @@ export default function Reports() {
   }
 
   // ── error ────────────────────────────────────────────────────────────
-  if (error) {
+  if (error && !data) {
     return (
       <div className="page-wrapper page-dark">
         <Navbar />
@@ -127,7 +191,7 @@ export default function Reports() {
     );
   }
 
-  const { readiness_score, resume, coding, interview, jobs, skill_gap, recommendations } = data;
+  const { readiness_score, resume, coding, interview, jobs, skill_gap, recommendations } = normalizeReportsData(data);
 
   // ── skill gap chart data ─────────────────────────────────────────────
   const gapChartData = skill_gap
@@ -156,6 +220,8 @@ export default function Reports() {
           <div className="dashboard-title">
             <h1>📊 Your Performance Analytics</h1>
             <p>All data is pulled live from your activity — resume scans, coding practice, and mock interviews.</p>
+            {refreshing && <p className="reports-cache-note">Refreshing from the server while showing your latest saved snapshot.</p>}
+            {error && data && <p className="reports-cache-note">Showing saved analytics because the latest refresh failed.</p>}
           </div>
 
           {/* ── Row 1: Readiness + Resume Trend ── */}
@@ -177,7 +243,7 @@ export default function Reports() {
                 <EmptyCard label="resume scan" />
               ) : (
                 <div className="chart-container">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={180}>
                     <LineChart data={resume.trend}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
                       <XAxis dataKey="label" stroke="#94a3b8" tick={{ fill: "#94a3b8", fontSize: 11 }} />
@@ -206,7 +272,7 @@ export default function Reports() {
                 <EmptyCard label="coding" />
               ) : (
                 <div className="chart-container">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={180}>
                     <PieChart>
                       <Pie data={coding.lang_chart} innerRadius={36} outerRadius={65} paddingAngle={4} dataKey="value">
                         {coding.lang_chart.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
@@ -258,7 +324,7 @@ export default function Reports() {
                 <EmptyCard label="job application" />
               ) : (
                 <div className="chart-container">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={180}>
                     <BarChart data={jobs.source_counts} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
                       <XAxis dataKey="name" stroke="#94a3b8" tick={{ fill: "#94a3b8", fontSize: 11 }} tickLine={false} axisLine={false} />
@@ -294,7 +360,7 @@ export default function Reports() {
                 </div>
               ) : (
                 <div className="chart-container-tall">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={260}>
                     <BarChart data={gapChartData} layout="vertical" margin={{ top: 4, right: 20, left: 80, bottom: 4 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
                       <XAxis type="number" domain={[0, 100]} stroke="#94a3b8" tick={{ fill: "#94a3b8", fontSize: 11 }} />
@@ -312,7 +378,7 @@ export default function Reports() {
               <h3 className="card-heading blue">🕸️ Skill Coverage Radar</h3>
               <p className="card-sub">Your coverage vs market demand (top 8 skills)</p>
               <div className="chart-container-tall">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={260}>
                   <RadarChart data={radarData}>
                     <PolarGrid stroke="#334155" />
                     <PolarAngleAxis dataKey="skill" tick={{ fill: "#94a3b8", fontSize: 11 }} />

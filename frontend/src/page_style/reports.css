@@ -23,6 +23,12 @@
 .dashboard-title h1 { font-size: 1.8rem; margin: 0 0 6px; }
 .dashboard-title p  { color: var(--dark-muted); margin: 0 0 28px; font-size: 0.95rem; }
 
+.reports-cache-note {
+  margin: 6px 0 0;
+  color: #93c5fd;
+  font-size: 0.82rem;
+}
+
 /* ── Grid layouts ── */
 .top-grid {
   display: grid;
@@ -98,8 +104,26 @@
 }
 
 /* Chart containers */
-.chart-container      { height: 180px; width: 100%; margin-bottom: 12px; }
-.chart-container-tall { height: 260px; width: 100%; }
+.chart-container {
+  height: 180px;
+  width: 100%;
+  min-width: 0;
+  min-height: 180px;
+  margin-bottom: 12px;
+}
+
+.chart-container-tall {
+  height: 260px;
+  width: 100%;
+  min-width: 0;
+  min-height: 260px;
+}
+
+.chart-container > .recharts-responsive-container,
+.chart-container-tall > .recharts-responsive-container {
+  min-width: 0;
+  min-height: 100%;
+}
 
 /* Stat rows */
 .stat-row {
@@ -211,6 +235,94 @@
 }
 
 /* ── Responsive ── */
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .top-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .stats-grid    { grid-template-columns: repeat(2, 1fr); }
+  .full-row-grid { grid-template-columns: 1fr; }
+}
+
+/* ──── Tablet (≤768px) ──── */
+@media (max-width: 768px) {
+  .reports-page { padding: 18px 14px; }
+  .dashboard-title { margin-bottom: 20px; }
+  .dashboard-title h1 { font-size: 1.5rem; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .stat-card { padding: 14px; }
+  .stat-label { font-size: 0.85rem; }
+  .stat-number { font-size: 1.6rem; }
+  .score-card { padding: 18px; }
+  .score-number { font-size: 2.8rem; }
+  .score-sublabel { font-size: 0.85rem; }
+  .chart-card { padding: 14px; }
+  .card-title { font-size: 0.95rem; margin-bottom: 12px; }
+  .recs-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+
+/* ──── Mobile (≤640px) ──── */
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+  .reports-page { padding: 16px 12px; }
+  .dashboard-title h1 { font-size: 1.4rem; margin-bottom: 18px; }
+  .dashboard-title p { font-size: 0.85rem; }
+  .stat-card { padding: 12px 14px; border-radius: 8px; }
+  .stat-label { font-size: 0.8rem; }
+  .stat-number { font-size: 1.5rem; }
+  .stat-unit { font-size: 0.7rem; }
+  .score-card { padding: 16px; border-radius: 10px; }
+  .score-number { font-size: 2.4rem; }
+  .score-sublabel { font-size: 0.8rem; }
+  .chart-card { padding: 12px; border-radius: 8px; }
+  .card-title { font-size: 0.9rem; margin-bottom: 10px; }
+  .recs-grid { grid-template-columns: 1fr; gap: 10px; }
+  .rec-item { border-radius: 6px; padding: 12px 14px; }
+  .rec-area { font-size: 0.8rem; }
+  .rec-action { font-size: 0.8rem; }
+  .tag { font-size: 0.7rem; padding: 3px 8px; }
+  .reports-footer { padding: 20px 0 10px; font-size: 0.8rem; }
+}
+
+/* ──── Small Mobile (≤480px) ──── */
+@media (max-width: 480px) {
+  .reports-page { padding: 12px 10px; min-height: calc(100vh - 60px); }
+  .dashboard-title { margin-bottom: 14px; }
+  .dashboard-title h1 { font-size: 1.2rem; line-height: 1.3; margin: 0 0 6px; }
+  .dashboard-title p { font-size: 0.75rem; }
+  .stat-card { padding: 10px 12px; border-radius: 8px; gap: 4px; }
+  .stat-label { font-size: 0.75rem; }
+  .stat-number { font-size: 1.3rem; }
+  .stat-unit { font-size: 0.65rem; }
+  .score-card { padding: 14px; }
+  .score-number { font-size: 2rem; }
+  .score-sublabel { font-size: 0.75rem; margin-top: 4px; }
+  .chart-card { padding: 10px; border-radius: 8px; }
+  .card-title { font-size: 0.85rem; margin-bottom: 8px; font-weight: 600; }
+  .recs-grid { gap: 8px; }
+  .rec-item { border-radius: 6px; padding: 10px 12px; border-left-width: 3px; }
+  .rec-header { flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 6px; }
+  .rec-area { font-size: 0.75rem; }
+  .rec-priority { font-size: 0.65rem; }
+  .rec-action { font-size: 0.75rem; line-height: 1.4; margin: 0; }
+  .tag { font-size: 0.65rem; padding: 2px 6px; }
+  .tag-count { font-size: 0.6rem; }
+  .reports-footer { padding: 14px 0 8px; font-size: 0.75rem; }
+}
+
+/* ──── Extra Small (≤360px) ──── */
+@media (max-width: 360px) {
+  .reports-page { padding: 10px 8px; }
+  .dashboard-title h1 { font-size: 1.1rem; }
+  .stat-card { padding: 8px 10px; }
+  .stat-number { font-size: 1.2rem; }
+  .score-card { padding: 12px; }
+  .score-number { font-size: 1.8rem; }
+  .chart-card { padding: 8px; }
+  .rec-item { padding: 8px 10px; }
+  .tag { font-size: 0.6rem; padding: 1px 5px; }
+}
 @media (max-width: 1100px) {
   .top-grid { grid-template-columns: 1fr; }
 }

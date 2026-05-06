@@ -18,6 +18,7 @@ import CodingPracticeHome from "./pages/CodingPracticeHome";
 import Interview from "./pages/Interview";
 import Reports from "./pages/Reports";
 import JobRecommendation from "./pages/JobRecommendation";
+import FloatingAssistant from "./components/FloatingAssistant";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
         <Route path="/template/Template5" element={<Template5 />} />
         <Route path="/template/Template6" element={<Template6 />} />
       </Routes>
+      <FloatingAssistant />
     </Router>
   );
 }

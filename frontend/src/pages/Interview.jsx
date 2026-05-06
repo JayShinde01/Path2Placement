@@ -5,24 +5,48 @@ import Navbar from "../components/Navbar";
 import "../page_style/interview.css";
 import { ML_API_URL } from "../api";
 
+const INTERVIEW_CACHE_KEY = "placementai:interview-state:v1";
+
+const readCache = () => {
+  try {
+    const raw = localStorage.getItem(INTERVIEW_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeCache = (value) => {
+  try {
+    localStorage.setItem(INTERVIEW_CACHE_KEY, JSON.stringify(value));
+  } catch {
+    // Ignore storage failures and keep the live session working.
+  }
+};
+
+const cachedInterview = readCache();
+const initialMessages = cachedInterview?.messages?.length
+  ? cachedInterview.messages
+  : [{ role: "system", text: "Hi there — I'm your AI interviewer. Say hi or start answering." }];
+
 export default function Interview() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const storedSessionId = localStorage.getItem("interviewSessionId") || "";
 
-  const [messages, setMessages] = useState([
-    { role: "system", text: "Hi there — I'm your AI interviewer. Say hi or start answering." }
-  ]);
-  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState(() => initialMessages);
+  const [input, setInput] = useState(() => cachedInterview?.draft || "");
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
-  const [sessionId, setSessionId] = useState(storedSessionId);
-  const [sessionList, setSessionList] = useState([]);
-  const [selectedSession, setSelectedSession] = useState(null);
+  const [sessionId, setSessionId] = useState(() => cachedInterview?.sessionId || storedSessionId);
+  const [sessionList, setSessionList] = useState(() => cachedInterview?.sessionList || []);
+  const [selectedSession, setSelectedSession] = useState(() => cachedInterview?.selectedSession || null);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState("");
   const recognitionRef = useRef(null);
   const bottomRef = useRef(null);
+  const currentSession = selectedSession?.session || null;
+  const sessionProgress = currentSession ? Math.min((currentSession.question_index / 10) * 100, 100) : 0;
 
   const loadSessionHistory = async (focusSessionId = sessionId) => {
     if (!token) return;
@@ -44,7 +68,8 @@ export default function Interview() {
       setSessionList(listData.sessions || []);
 
       const activeId = focusSessionId || listData.sessions?.[0]?.session_id;
-      if (activeId) {
+      const activeSessionExists = listData.sessions?.some((session) => session.session_id === activeId);
+      if (activeId && activeSessionExists) {
         const detailRes = await fetch(`${ML_API_URL}api/interview/sessions/${activeId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -58,8 +83,20 @@ export default function Interview() {
             setSessionId(detailData.session.session_id);
             localStorage.setItem("interviewSessionId", detailData.session.session_id);
           }
+          writeCache({
+            sessionId: detailData.session?.session_id || activeId,
+            sessionList: listData.sessions || [],
+            selectedSession: detailData,
+            messages,
+            draft: input,
+            savedAt: Date.now(),
+          });
         }
       } else {
+        if (activeId === sessionId) {
+          setSessionId("");
+          localStorage.removeItem("interviewSessionId");
+        }
         setSelectedSession(null);
       }
     } catch (err) {
@@ -75,6 +112,18 @@ export default function Interview() {
       loadSessionHistory(storedSessionId || sessionId);
     }
   }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    writeCache({
+      sessionId,
+      sessionList,
+      selectedSession,
+      messages,
+      draft: input,
+      savedAt: Date.now(),
+    });
+  }, [token, sessionId, sessionList, selectedSession, messages, input]);
 
   // Scroll to bottom whenever messages change
   useEffect(() => {
@@ -180,6 +229,24 @@ export default function Interview() {
     }
   };
 
+  const startNewSession = () => {
+    setSessionId("");
+    setSelectedSession(null);
+    setMessages([
+      { role: "system", text: "Hi there — I'm your AI interviewer. Say hi or start answering." },
+    ]);
+    setInput("");
+    localStorage.removeItem("interviewSessionId");
+    writeCache({
+      sessionId: "",
+      sessionList,
+      selectedSession: null,
+      messages: [{ role: "system", text: "Hi there — I'm your AI interviewer. Say hi or start answering." }],
+      draft: "",
+      savedAt: Date.now(),
+    });
+  };
+
   // small typing indicator animation for AI
   const TypingIndicator = () => (
     <div className="typing-indicator" aria-hidden>
@@ -217,6 +284,45 @@ export default function Interview() {
             <button className="icon-btn" title="Voice help" onClick={() => speak("Ask me anything. I'm ready to interview you.")}>🔊</button>
           </div>
         </motion.header>
+
+        <motion.section
+          className="interview-hero"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+        >
+          <div className="hero-copy">
+            <div className="hero-kicker">Focused mock interview</div>
+            <h1>Practice like a real interview, with session memory and instant feedback.</h1>
+            <p>
+              Track your current role, review past sessions, and keep the conversation moving with voice or typed answers.
+            </p>
+          </div>
+
+          <div className="hero-status">
+            <div className="hero-chip-row">
+              <span className="hero-chip">{currentSession?.role || "No role selected"}</span>
+              <span className="hero-chip hero-chip-soft">
+                {currentSession?.status === "completed" ? "Completed" : currentSession ? "In progress" : "Ready to start"}
+              </span>
+            </div>
+
+            <div className="hero-progress">
+              <div className="hero-progress-label">
+                <span>Session progress</span>
+                <strong>{currentSession ? `${currentSession.question_index}/10` : "0/10"}</strong>
+              </div>
+              <div className="hero-progress-track">
+                <div className="hero-progress-fill" style={{ width: `${sessionProgress}%` }} />
+              </div>
+            </div>
+
+            <div className="hero-actions">
+              <button className="hero-btn hero-btn-primary" onClick={() => speak("Start by answering the interview question in your own words.")}>Speak a tip</button>
+              <button className="hero-btn hero-btn-secondary" onClick={startNewSession}>New session</button>
+            </div>
+          </div>
+        </motion.section>
 
         <section className="history-panel">
           <div className="history-panel-header">
