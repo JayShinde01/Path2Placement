@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../page_style/dashboard.css";
 import Navbar from "../components/Navbar";
+import { syncLatestResumeData } from "../utils/resumeCache";
 
 // Helper function to capitalize placeholders
 const formatLabel = (str) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -37,12 +38,9 @@ export default function Dashboard() {
 
     const fetchResume = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/resumes", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const result = await res.json();
-        if (result.length > 0) {
-          setData(result[0].data);
+        const resumeData = await syncLatestResumeData(token);
+        if (resumeData) {
+          setData(resumeData);
         }
       } catch (err) {
         console.error("Error loading resume:", err);
@@ -104,6 +102,7 @@ export default function Dashboard() {
           data: data,
         }),
       });
+      localStorage.setItem("resumeData", JSON.stringify(data));
       navigate("/templates");
     } catch (err) {
       console.error("Error saving resume:", err);

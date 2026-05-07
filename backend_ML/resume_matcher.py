@@ -105,6 +105,51 @@ def extract_text_from_docx(file_bytes: bytes) -> str:
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
+
+def recover_partial_json_object(text: str) -> str:
+    """
+    Best-effort recovery for a JSON object that was truncated before the final
+    closing braces. This keeps the API resilient when Gemini cuts off output.
+    """
+    start = text.find("{")
+    if start == -1:
+        return ""
+
+    fragment = text[start:].strip()
+    balanced_chars = []
+    stack = []
+    in_string = False
+    escape_next = False
+
+    for char in fragment:
+        balanced_chars.append(char)
+
+        if in_string:
+            if escape_next:
+                escape_next = False
+            elif char == "\\":
+                escape_next = True
+            elif char == '"':
+                in_string = False
+            continue
+
+        if char == '"':
+            in_string = True
+        elif char in "[{":
+            stack.append(char)
+        elif char in "]}":
+            if stack:
+                stack.pop()
+
+    if in_string:
+        balanced_chars.append('"')
+
+    while stack:
+        opener = stack.pop()
+        balanced_chars.append("]" if opener == "[" else "}")
+
+    return "".join(balanced_chars)
+
 # --- DOCX Generation from JSON (Helper Function) ---
 def generate_resume_from_json(data: dict):
     """
@@ -257,9 +302,9 @@ async def match_resume(
 
 Please provide the following information in a JSON object:
 1.  **`match_score`**: An integer representing the overall percentage match of the resume to the job description (0-100). Be fair and realistic. This should be a single, numerical value.
-2.  **`matched_skills`**: A list of key skills found in the resume that are also explicitly mentioned or clearly implied as required by the job description.
-3.  **`missing_skills`**: A list of important skills mentioned in the job description that are either missing from the resume or not clearly highlighted. Prioritize up to 7 most critical missing skills.
-4.  **`suggestions`**: A concise, actionable paragraph of 2-3 sentences advising the candidate on how to improve their resume to better match the job description, specifically addressing the missing skills and recommending how to integrate keywords naturally.
+2.  **`matched_skills`**: A short list of key skills found in the resume that are also explicitly mentioned or clearly implied as required by the job description.
+3.  **`missing_skills`**: A short list of the most important skills mentioned in the job description that are missing from the resume. Prioritize the top 5 most critical missing skills.
+4.  **`suggestions`**: A concise, actionable paragraph of 1-2 sentences advising the candidate on how to improve their resume to better match the job description.
 
 Return ONLY the JSON object. Do not include any conversational text, markdown outside the JSON, or code blocks (like ```json).
 
@@ -286,7 +331,7 @@ Example JSON Structure (ensure your output strictly follows this):
             "temperature": 0.1, # Keep temperature low for more consistent results for matching
             "topK": 40,
             "topP": 0.95,
-            "maxOutputTokens": 2048, # Increased to prevent JSON truncation
+            "maxOutputTokens": 3072, # Allow more room for a complete JSON response
             "responseMimeType": "application/json", # Forces pure JSON output
         }
     }
@@ -323,21 +368,37 @@ Example JSON Structure (ensure your output strictly follows this):
 
     try:
         gemini_response_data = response_from_gemini.json()
-        generated_text = gemini_response_data["candidates"][0]["content"]["parts"][0]["text"]
+        response_parts = gemini_response_data["candidates"][0]["content"].get("parts", [])
+        generated_text = "".join(
+            part.get("text", "")
+            for part in response_parts
+            if isinstance(part, dict) and part.get("text")
+        )
         logging.info(f"Raw Gemini Match Response (first 500 chars): {generated_text[:500]}...")
+
+        if not generated_text.strip():
+            raise ValueError("Gemini match response did not contain any text parts.")
 
         # Robust JSON extraction: Find the first '{' and the last '}'
         json_start = generated_text.find("{")
         json_end = generated_text.rfind("}")
 
-        if json_start == -1 or json_end == -1 or json_end < json_start:
-            logging.error(f"No complete JSON object found in Gemini match output. Generated text: {generated_text}")
-            raise ValueError("No complete JSON object found in AI match output.")
+        if json_start == -1:
+            logging.error(f"No JSON object start found in Gemini match output. Generated text: {generated_text}")
+            raise ValueError("No JSON object found in AI match output.")
 
-        match_result_json_string = generated_text[json_start : json_end + 1]
+        match_result_json_string = generated_text[json_start : json_end + 1 if json_end != -1 and json_end > json_start else len(generated_text)]
         match_result_json_string = match_result_json_string.strip() # Remove whitespace
 
-        match_data = json.loads(match_result_json_string)
+        try:
+            match_data = json.loads(match_result_json_string)
+        except json.JSONDecodeError as parse_error:
+            recovered_json_string = recover_partial_json_object(match_result_json_string)
+            if not recovered_json_string:
+                raise parse_error
+
+            logging.warning("Gemini match output was truncated; attempting recovery with balanced JSON braces.")
+            match_data = json.loads(recovered_json_string)
         logging.info("Successfully parsed JSON from AI match response.")
 
         # Validate the structure of the AI's response for the match endpoint

@@ -34,9 +34,15 @@ export default function Navbar() {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
+  const clearAppStorage = () => {
+    const preservedTheme = localStorage.getItem("theme") || "dark";
+    localStorage.clear();
+    localStorage.setItem("theme", preservedTheme);
+    document.documentElement.setAttribute("data-theme", preservedTheme);
+  };
+
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
+    clearAppStorage();
     setUserName(null);
     setMenuOpen(false);
     navigate("/login");

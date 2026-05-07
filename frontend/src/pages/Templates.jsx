@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { ML_API_URL } from "../api";
 import "../page_style/templates.css";
+import { syncLatestResumeData } from "../utils/resumeCache";
 
 const TEMPLATE_META = {
   Template1: { label: "Navy Sidebar",       color: "#1f4e8c", tag: "Professional", desc: "Two-column layout with bold navy sidebar. Corporate roles." },
@@ -47,14 +48,10 @@ export default function Templates() {
 
     // 2. ✅ Fetch the User's Resume Data directly from the database
     if (token) {
-      axios
-        .get("http://localhost:8000/api/resumes", { // Note: Update URL if needed to match your backend
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        .then((res) => {
-          // If the user has saved a resume, store it in state
-          if (res.data && res.data.length > 0) {
-            setResumeData(res.data[0].data);
+      syncLatestResumeData(token)
+        .then((resumeData) => {
+          if (resumeData) {
+            setResumeData(resumeData);
           }
         })
         .catch((err) => console.error("Error loading resume data:", err));

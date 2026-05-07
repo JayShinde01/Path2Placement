@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "../page_style/login.css";
 import { AUTH_API_URL } from "../api";
+import { syncLatestResumeData } from "../utils/resumeCache";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -20,6 +21,11 @@ export default function Login() {
       const res = await axios.post(`${AUTH_API_URL}api/auth/login`, { email, password });
       localStorage.setItem("userName", res.data.user.name);
       localStorage.setItem("token", res.data.token);
+      try {
+        await syncLatestResumeData(res.data.token);
+      } catch (resumeErr) {
+        console.error("Error loading saved resume after login:", resumeErr);
+      }
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid credentials. Please try again.");

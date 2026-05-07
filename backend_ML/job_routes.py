@@ -14,10 +14,22 @@ async def get_recommended_jobs(body: dict):
         query = body.get("query", "developer")
         location = body.get("location", "India")
         skills = body.get("skills", [])
+        profile = body.get("profile", {})
 
-        jobs = recommend_jobs(query, location, skills)
+        jobs, debug_meta = recommend_jobs(query, location, skills, profile, include_meta=True)
+        source_counts = {}
+        for job in jobs:
+            source = job.get("source", "Unknown")
+            source_counts[source] = source_counts.get(source, 0) + 1
 
-        return {"results": jobs}
+        return {
+            "results": jobs,
+            "meta": {
+                "total": len(jobs),
+                "source_counts": source_counts,
+                "debug": debug_meta,
+            },
+        }
     except Exception as exc:
         print("Job recommendation endpoint fallback:", exc)
         return {"results": []}

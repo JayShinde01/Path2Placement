@@ -3,11 +3,88 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import "../page_style/jobrecommendation.css";
 import { ML_API_URL } from "../api";
+import { syncLatestResumeData } from "../utils/resumeCache";
+
+const RESUME_PROFILE_KEY = "resumeProfile";
+const INVALID_LOCATION_HINTS = ["hostel", "boys hostel", "girls hostel", "pg", "room", "near", "chowk", "road"];
+
+const toText = (value) => (typeof value === "string" ? value.trim() : "");
+
+const splitTerms = (value) =>
+  (value || "")
+    .split(/[,/|\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const buildResumeProfile = (resumeData) => {
+  const personal = resumeData?.personal || {};
+  const skills = Array.isArray(resumeData?.skills) ? resumeData.skills.filter(Boolean) : [];
+  const experience = Array.isArray(resumeData?.experience) ? resumeData.experience : [];
+  const education = Array.isArray(resumeData?.education) ? resumeData.education : [];
+  const projects = Array.isArray(resumeData?.projects) ? resumeData.projects : [];
+  const certifications = Array.isArray(resumeData?.certifications) ? resumeData.certifications.filter(Boolean) : [];
+  const achievements = Array.isArray(resumeData?.achievements) ? resumeData.achievements.filter(Boolean) : [];
+  const activities = Array.isArray(resumeData?.activities) ? resumeData.activities.filter(Boolean) : [];
+  const languages = Array.isArray(resumeData?.languages) ? resumeData.languages.filter(Boolean) : [];
+
+  const experienceRoles = experience.flatMap((item) => splitTerms(`${item?.role || ""}, ${item?.company || ""}, ${item?.duration || ""}, ${item?.description || ""}`));
+  const educationTerms = education.flatMap((item) => splitTerms(`${item?.degree || ""}, ${item?.institute || ""}, ${item?.year || ""}, ${item?.grade || ""}`));
+  const projectTerms = projects.flatMap((item) => splitTerms(`${item?.title || ""}, ${item?.tech || ""}, ${item?.description || ""}`));
+  const bioText = [personal.title, personal.summary, personal.address].filter(Boolean).join(" ");
+
+  const city = personal.address ? personal.address.split(",")[0]?.trim() || "" : "";
+  const cleanCity = INVALID_LOCATION_HINTS.some((token) => city.toLowerCase().includes(token)) ? "" : city;
+
+  const inferredQuery = (
+    personal.title ||
+    skills[0] ||
+    experienceRoles[0] ||
+    educationTerms[0] ||
+    projectTerms[0] ||
+    "developer"
+  ).trim();
+
+  const profile = {
+    name: toText(personal.name),
+    title: toText(personal.title),
+    summary: toText(personal.summary),
+    email: toText(personal.email),
+    phone: toText(personal.phone),
+    location: cleanCity,
+    address: toText(personal.address),
+    github: toText(personal.github),
+    linkedin: toText(personal.linkedin),
+    skills,
+    experience_roles: experienceRoles,
+    education: educationTerms,
+    projects: projectTerms,
+    certifications,
+    achievements,
+    activities,
+    languages,
+    bio: toText(bioText),
+    inferred_query: inferredQuery,
+    search_terms: [
+      inferredQuery,
+      ...skills,
+      ...experienceRoles,
+      ...educationTerms,
+      ...projectTerms,
+      ...certifications,
+      ...achievements,
+      ...activities,
+      ...languages,
+    ].filter(Boolean),
+  };
+
+  return profile;
+};
 
 export default function JobRecommendation() {
   const [jobs, setJobs] = useState([]);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [skills, setSkills] = useState([]);
+  const [resumeProfile, setResumeProfile] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,30 +103,46 @@ export default function JobRecommendation() {
   // 🔥 Load resume (skills + location)
   // ================================
   useEffect(() => {
-    const saved = localStorage.getItem("resumeData");
+    const token = localStorage.getItem("token");
 
-    if (saved) {
+    const applyResume = (parsed) => {
       try {
-        const parsed = JSON.parse(saved);
+        const profile = buildResumeProfile(parsed);
+        setResumeProfile(profile);
+        localStorage.setItem(RESUME_PROFILE_KEY, JSON.stringify(profile));
 
         // ✅ Load skills
-        setSkills(parsed.skills || []);
+        setSkills(profile.skills || []);
 
         // ✅ Extract location (if user not typed)
-        if (parsed.personal?.address && !apiLocation) {
-          const address = parsed.personal.address;
+        if (profile.location && !apiLocation) {
+          setApiLocation(profile.location);
+        }
 
-          // 👉 Extract city (first part)
-          const city = address.split(",")[0]?.trim();
-
-          if (city) {
-            setApiLocation(city);
-          }
+        // ✅ Use inferred role when no manual query is entered yet
+        if (!query || query === "Java") {
+          setQuery(profile.inferred_query || "developer");
         }
 
       } catch (err) {
         console.error("Resume parse error:", err);
       }
+    };
+
+    const saved = localStorage.getItem("resumeData");
+    if (saved) {
+      applyResume(JSON.parse(saved));
+      return;
+    }
+
+    if (token) {
+      syncLatestResumeData(token)
+        .then((resumeData) => {
+          if (resumeData) {
+            applyResume(resumeData);
+          }
+        })
+        .catch((err) => console.error("Resume sync error:", err));
     }
   }, []);
 
@@ -137,6 +230,7 @@ export default function JobRecommendation() {
           query,
           location: apiLocation || "India",
           skills: skills.filter(Boolean),
+          profile: resumeProfile || JSON.parse(localStorage.getItem(RESUME_PROFILE_KEY) || "null"),
         }),
       });
 
@@ -223,7 +317,7 @@ export default function JobRecommendation() {
 
           <input
             className="jobrec-input"
-            placeholder="Location (e.g Pune)"
+            placeholder="Location (optional, e.g. Pune)"
             value={apiLocation}
             onChange={(e) => setApiLocation(e.target.value)}
           />
